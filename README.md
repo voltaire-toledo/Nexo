@@ -41,7 +41,7 @@ Use the **"Download JSON"** export if migrating to a **new/empty vault** or a di
 ### 3. Expert Mode: Import the Cleaned JSON back into your Vault
 This will get your Vault back into a much cleaner state sooner, and it was always part of the original design. 
 
-> ! [NOTE]
+> [!CAUTION]
 > When importing a new JSON, with all your unique and merged records, into your Bitwarden vault, it is highly recommended to: 
 > - Delete all the records currently in your Vault so they end up in the Trash directory, or…
 > - Import them into a new and empty directory.
