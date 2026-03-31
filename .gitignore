@@ -1,0 +1,34 @@
+# Local agent/tooling state
+.agents/
+.gemini/
+.github/skills/
+skills-lock.json
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+.env.*
+*.local
+
+# Vault import/export artifacts
+# This repo should not contain real Bitwarden or password-manager data.
+/*.json
+!/package.json
+!/package-lock.json
+!/tsconfig.json
+!/jsconfig.json
+!/deno.json
+!/deno.jsonc
+!/composer.json
+
+/*.csv
+/*.tsv
+/*.xml
+/*.zip
+/*.1pif
+/*.1pux
+/*.kdbx
+/*.kdbxx

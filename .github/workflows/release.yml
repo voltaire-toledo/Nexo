@@ -1,0 +1,45 @@
+name: Release Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare release bundle
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          BUNDLE_DIR="Nexo-${TAG_NAME}"
+
+          mkdir -p "${BUNDLE_DIR}/assets"
+
+          cp Nexo.html "${BUNDLE_DIR}/"
+          cp README.md "${BUNDLE_DIR}/"
+          cp PRD.md "${BUNDLE_DIR}/"
+          cp TODO.md "${BUNDLE_DIR}/"
+          cp TEST_GUIDE.md "${BUNDLE_DIR}/"
+          cp RELEASE.md "${BUNDLE_DIR}/"
+          cp LICENSE "${BUNDLE_DIR}/"
+          cp -R assets/. "${BUNDLE_DIR}/assets/"
+
+          zip -r "Nexo-${TAG_NAME}.zip" "${BUNDLE_DIR}"
+
+      - name: Publish GitHub release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          gh release create "${TAG_NAME}" "Nexo-${TAG_NAME}.zip" \
+            --title "${TAG_NAME}" \
+            --generate-notes

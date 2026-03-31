@@ -1,0 +1,3204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;">
+    <title>Nexo - Duplicate Cleanup for Bitwarden Vaults</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512' fill='none'%3E%3Crect width='512' height='512' rx='112' fill='%231E3D46'/%3E%3Cpath d='M122 376V136' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M122 136L390 376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M390 136V376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='255' cy='256' r='34' fill='%23C9822B'/%3E%3C/svg%3E">
+    
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            /* Burned Teal Palette - Professional Brand Identity */
+            --anchor: #233F4C;
+            --teal-deep: #0F6670;
+            --teal-mid: #0A8E84;
+            --teal-light: #B1CEDE;
+            --accent: #CB7F29; /* Ochre Spark */
+            --accent-hover: #a6651f;
+            --accent-subtle: #f9ead2;
+            
+            --success: #0A8E84;
+            --danger: #dc2626;
+            --warning: #CB7F29;
+            
+            /* Burned Base (Off-White/Cream) */
+            --bg-page: #F1F1E6;
+            --bg-surface: #ffffff;
+            --bg-muted: #e8e8d9;
+            --bg-subtle: #dbdbc7;
+            
+            --fg-base: #233F4C;
+            --fg-muted: #3d5a68;
+            --fg-subtle: #5a7684;
+            --fg-ghost: #8aa1ae;
+            
+            --border: #dbdbc7;
+            --border-subtle: #e8e8d9;
+
+            /* Compatibility aliases for older selectors kept elsewhere in this file */
+            --bg-primary: var(--bg-surface);
+            --bg-hover: var(--bg-muted);
+            --border-color: var(--border);
+            --accent-primary: var(--accent);
+            --text-primary: var(--fg-base);
+            --text-secondary: var(--fg-muted);
+            --text-tertiary: var(--fg-subtle);
+            --text-muted: var(--fg-muted);
+            --warning-color: var(--warning);
+            
+            /* Elevation & Rhythm */
+            --shadow-sm: 0 1px 2px rgba(35, 63, 76, 0.08);
+            --shadow-md: 0 4px 6px -1px rgba(35, 63, 76, 0.12), 0 2px 4px -1px rgba(35, 63, 76, 0.06);
+            
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 12px;
+            
+            /* Advanced System Stacks */
+            --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-serif: ui-serif, Georgia, "Times New Roman", serif;
+            --font-mono: ui-monospace, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            
+            --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Mode: Deep Sea Anchor */
+        :root[data-theme="dark"] {
+            --bg-page: #162a33;
+            --bg-surface: #233F4C;
+            --bg-muted: #2d4d5a;
+            --bg-subtle: #3a5f6d;
+            
+            --fg-base: #F1F1E6;
+            --fg-muted: #B1CEDE;
+            --fg-subtle: #8aa1ae;
+            --fg-ghost: #5a7684;
+            
+            --border: #2d4d5a;
+            --border-subtle: #3a5f6d;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-page: #162a33;
+                --bg-surface: #233F4C;
+                --bg-muted: #2d4d5a;
+                --bg-subtle: #3a5f6d;
+                
+                --fg-base: #F1F1E6;
+                --fg-muted: #B1CEDE;
+                --fg-subtle: #8aa1ae;
+                --fg-ghost: #5a7684;
+                
+                --border: #2d4d5a;
+                --border-subtle: #3a5f6d;
+            }
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background:
+                radial-gradient(circle at top left, rgba(177, 206, 222, 0.38), transparent 28rem),
+                radial-gradient(circle at top right, rgba(203, 127, 41, 0.08), transparent 22rem),
+                var(--bg-page);
+            color: var(--fg-base);
+            line-height: 1.6;
+            padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 3rem;
+            min-height: 100vh;
+            font-size: clamp(15px, 0.95rem, 16px);
+            -webkit-font-smoothing: antialiased;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .theme-toggle {
+            position: relative;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            color: var(--fg-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .theme-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #githubBtn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* ===== PAGE TITLE ===== */
+        .page-title {
+            margin-bottom: clamp(2.25rem, 5vw, 3.25rem);
+            max-width: 46rem;
+        }
+
+        .page-title h1 {
+            color: var(--fg-base);
+            font-size: clamp(1.875rem, 4vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 0.5rem;
+            line-height: 1.15;
+        }
+
+        .page-title p {
+            color: var(--fg-muted);
+            font-size: clamp(1rem, 1.8vw, 1.125rem);
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 42rem;
+        }
+
+        /* ===== PRIVACY BANNER ===== */
+        .privacy-banner {
+            background: var(--success);
+            color: white;
+            padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 3vw, 1.75rem);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .privacy-banner svg {
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        
+        .privacy-banner-content {
+            flex: 1;
+        }
+        
+        .privacy-banner strong {
+            font-weight: 600;
+        }
+
+        /* ===== EXTENSION WARNING ===== */
+        .extension-warning {
+            background: var(--warning);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .extension-warning.show {
+            display: block;
+        }
+
+        .extension-warning h3 {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .extension-warning ul {
+            margin: 12px 0 12px 24px;
+        }
+
+        /* ===== UPLOAD ZONE ===== */
+        .getting-started {
+            display: grid;
+            grid-template-columns: 60% 1fr;
+            gap: 1.75rem;
+            margin-bottom: 1.5rem;
+            align-items: stretch;
+        }
+
+        .upload-zone {
+            background: #95B1B0;
+            color: var(--anchor);
+            border: 2px dashed rgba(35, 63, 76, 0.3);
+            border-radius: var(--radius-lg);
+            padding: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.5rem) 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            gap: 1rem;
+            min-height: 100%;
+        }
+
+        .upload-zone-header {
+            align-self: start;
+            justify-self: stretch;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.125rem;
+        }
+
+        .upload-zone .btn-primary {
+            width: 100%;
+            max-width: 340px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1.05rem;
+            background: var(--anchor);
+            border-color: var(--anchor);
+            color: white;
+        }
+
+        .upload-zone-footer {
+            align-self: end;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--anchor);
+            background: #84a2a1; /* Slightly deeper version of #95B1B0 */
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-zone svg {
+            margin-bottom: 0.5rem;
+            stroke: var(--anchor);
+            transition: stroke var(--transition);
+        }
+
+        .upload-zone:hover svg {
+            stroke: var(--teal-deep);
+        }
+
+        .upload-zone h2 {
+            color: var(--anchor);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .upload-zone p {
+            color: rgba(35, 63, 76, 0.8);
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-muted);
+            color: var(--fg-base);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-subtle);
+            border-color: var(--fg-subtle);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.875rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-surface);
+            color: var(--fg-base);
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        /* ===== VAULT STATUS BAR (Sticky Optimization) ===== */
+        .vault-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-surface);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 1rem;
+            z-index: 500;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        :root[data-theme="dark"] .vault-status-bar {
+            background: rgba(28, 25, 23, 0.9);
+        }
+
+        .status-metrics {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.1;
+            font-feature-settings: "tnum";
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--fg-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* ===== RESULTS SECTION ===== */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .no-duplicates {
+            background: var(--success);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .no-duplicates h2 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* ===== DUPLICATE CLUSTERS ===== */
+        .clusters-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .cluster {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: clamp(1.5rem, 3vw, 2.5rem);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--transition);
+        }
+
+        .cluster:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .cluster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .cluster-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .match-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .match-tag {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-sm);
+            background: var(--bg-muted);
+            color: var(--fg-subtle);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border);
+        }
+
+        .tag-conflict {
+            background: #fef2f2;
+            color: var(--danger);
+            border-color: #fee2e2;
+        }
+
+        .tag-merge {
+            background: #f0fdfa;
+            color: var(--teal-deep);
+            border-color: #ccfbf1;
+        }
+
+        .divergence-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid var(--accent);
+            border-radius: 3px;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 12px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            background: var(--bg-surface);
+            line-height: 1;
+        }
+
+        .cluster-actions {
+            display: flex;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+            gap: 1.5rem;
+        }
+
+        .divergent-value {
+            font-weight: 700;
+            text-decoration: underline decoration-style wavy var(--accent);
+            text-underline-offset: 3px;
+        }
+
+        /* ===== ITEM CARD ===== */
+        .item-card {
+            background: var(--bg-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: all var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .item-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-sm);
+            background: var(--bg-surface);
+        }
+
+        .item-card.marked-delete {
+            border-color: var(--danger);
+            background: var(--bg-subtle);
+        }
+
+        .item-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+            word-break: break-word;
+            color: var(--fg-base);
+            letter-spacing: -0.01em;
+        }
+
+        .item-type-badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 3px;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .item-delete-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .item-delete-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(203, 127, 41, 0.08);
+            border: 1px solid rgba(203, 127, 41, 0.16);
+        }
+
+        .item-delete-control svg {
+            width: 15px;
+            height: 15px;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .item-detail {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .detail-label {
+            color: var(--fg-ghost);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-top: 0.125rem;
+        }
+
+        .detail-value {
+            color: var(--fg-base);
+            word-break: break-word;
+            font-feature-settings: "tnum", "cv01";
+        }
+
+        .detail-value-muted {
+            color: var(--fg-ghost);
+            font-style: italic;
+        }
+
+        .uri-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .uri-list li {
+            word-break: break-all;
+            font-size: 0.75rem;
+            color: var(--fg-muted);
+            padding: 0.4rem 0.6rem;
+            background: var(--bg-subtle);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            border: 1px solid var(--border);
+            font-feature-settings: "tnum";
+        }
+
+        /* Password Display */
+        .password-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-value {
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+            font-feature-settings: "tnum";
+        }
+
+        .password-toggle {
+            background: none;
+            border: none;
+            color: var(--fg-ghost);
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            transition: color var(--transition);
+            border-radius: var(--radius-sm);
+        }
+
+        .password-toggle:hover {
+            color: var(--accent);
+        }
+
+        .password-toggle:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .metadata-tags {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid transparent;
+            font-feature-settings: "tnum";
+        }
+
+        .meta-tag.present {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .meta-tag.absent {
+            background: var(--bg-subtle);
+            color: var(--fg-ghost);
+            border-color: var(--border);
+            opacity: 0.5;
+        }
+
+        .completeness-score {
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .score-bar {
+            background: var(--bg-subtle);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width var(--transition);
+        }
+
+        /* High-Visibility Focus States */
+        button:focus-visible, 
+        input:focus-visible, 
+        .upload-zone:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
+
+        .item-card.marked-delete .item-name {
+            text-decoration: line-through;
+            color: var(--fg-base);
+        }
+
+        .difference-indicator {
+            background: var(--warning-color);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== INSTRUCTIONS PANEL ===== */
+        .instructions {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem clamp(1rem, 2vw, 1.5rem);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 1rem;
+        }
+
+        .export-guide {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .export-guide h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--fg-base);
+            margin-bottom: 1rem;
+        }
+
+        .export-content {
+            margin-top: 1rem;
+        }
+
+        .export-content.hidden {
+            display: none;
+        }
+
+        .instruction-list {
+            list-style: decimal;
+            margin-left: 0;
+            padding-left: 1.25rem;
+            color: var(--fg-muted);
+            font-size: 0.875rem;
+        }
+
+        .instruction-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        code:hover {
+            opacity: 0.8;
+        }
+
+        .instruction-list code,
+        .script-instructions code {
+            background: var(--bg-muted);
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.8125em;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all var(--transition);
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .instruction-list code:hover,
+        .script-instructions code:hover {
+            background: var(--accent-subtle);
+            border-color: var(--accent);
+            color: var(--accent-hover);
+        }
+
+        .instruction-list code:active,
+        .script-instructions code:active {
+            transform: scale(0.96);
+        }
+
+        .instruction-list code::after,
+        .script-instructions code::after {
+            content: 'Copy';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-4px);
+            background: var(--fg-base);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .instruction-list code:hover::after,
+        .script-instructions code:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-8px);
+        }
+
+        .instruction-list code.copied-flash::after,
+        .script-instructions code.copied-flash::after {
+            content: 'Copied!';
+            background: var(--success);
+            opacity: 1;
+            transform: translateX(-50%) translateY(-8px);
+        }
+
+        :root[data-theme="dark"] .instruction-list code::after,
+        :root[data-theme="dark"] .script-instructions code::after {
+            background: #f1f1e6;
+            color: #233f4c;
+            border: 1px solid rgba(35, 63, 76, 0.18);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+        }
+        .instructions h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .instructions ol {
+            list-style-position: inside;
+            padding-left: 0;
+            margin-left: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 0.375rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            padding-left: 0;
+            font-size: clamp(0.75rem, 1.2vw, 0.8125rem);
+        }
+
+        .warning-box-tight {
+            background: var(--bg-muted);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
+        .shortcuts-text {
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            font-size: 0.8rem;
+        }
+        
+        .instructions li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== KBD STYLE ===== */
+        kbd {
+            background-color: var(--bg-muted);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+            color: var(--fg-base);
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            line-height: 1;
+            padding: 2px 4px;
+            white-space: nowrap;
+        }
+
+        /* ===== FOOTER BAND ===== */
+        .footer-disclaimer {
+            margin-top: 4.5rem;
+            padding: 2.25rem 0 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-disclaimer p {
+            font-size: 0.74rem;
+            color: var(--fg-ghost);
+            line-height: 1.65;
+            max-width: 44rem;
+            margin: 0 auto;
+        }
+
+        .footer-disclaimer p + p {
+            margin-top: 0.75rem;
+        }
+
+        .footer-disclaimer strong {
+            color: var(--fg-subtle);
+        }
+        
+        .instructions p {
+            color: var(--text-secondary);
+            line-height: 1.4;
+            font-size: clamp(0.6875rem, 1.1vw, 0.75rem);
+        }
+
+        /* ===== CLI SCRIPT MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--fg-base);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--fg-ghost);
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            line-height: 1;
+            transition: color var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--fg-base);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .script-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .script-tab {
+            padding: 0.625rem 1.25rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--fg-muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+
+        .script-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .script-content {
+            display: none;
+        }
+
+        .script-content.active {
+            display: block;
+        }
+
+        .script-box {
+            background: var(--bg-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .script-box textarea {
+            width: 100%;
+            min-height: 300px;
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            background: var(--bg-subtle);
+            color: var(--fg-base);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.5rem 0.875rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .script-instructions {
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .script-instructions h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9375rem;
+            color: var(--fg-base);
+        }
+
+        .script-instructions ol {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .script-instructions li {
+            margin-bottom: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--fg-muted);
+            line-height: 1.5;
+        }
+
+        .script-instructions code {
+            background: var(--bg-muted);
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.8125em;
+            color: var(--accent);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .getting-started {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-actions">
+            <a href="https://github.com/voltaire-toledo/Nexo" target="_blank" rel="noopener noreferrer" class="theme-toggle" id="githubBtn" title="View on GitHub">
+                <svg width="26" height="26" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M56.7937 84.9688C44.4187 83.4688 35.7 74.5625 35.7 63.0313C35.7 58.3438 37.3875 53.2813 40.2 49.9063C38.9812 46.8125 39.1687 40.25 40.575 37.5313C44.325 37.0625 49.3875 39.0313 52.3875 41.75C55.95 40.625 59.7 40.0625 64.2937 40.0625C68.8875 40.0625 72.6375 40.625 76.0125 41.6563C78.9187 39.0313 84.075 37.0625 87.825 37.5313C89.1375 40.0625 89.325 46.625 88.1062 49.8125C91.1062 53.375 92.7 58.1563 92.7 63.0313C92.7 74.5625 83.9812 83.2813 71.4187 84.875C74.6062 86.9375 76.7625 91.4375 76.7625 96.5938L76.7625 106.344C76.7625 109.156 79.1062 110.75 81.9187 109.625C98.8875 103.156 112.2 86.1875 112.2 65.1875C112.2 38.6563 90.6375 17 64.1062 17C37.575 17 16.2 38.6562 16.2 65.1875C16.2 86 29.4187 103.25 47.2312 109.719C49.7625 110.656 52.2 108.969 52.2 106.438L52.2 98.9375C50.8875 99.5 49.2 99.875 47.7 99.875C41.5125 99.875 37.8562 96.5 35.2312 90.2188C34.2 87.6875 33.075 86.1875 30.9187 85.9063C29.7937 85.8125 29.4187 85.3438 29.4187 84.7813C29.4187 83.6563 31.2937 82.8125 33.1687 82.8125C35.8875 82.8125 38.2312 84.5 40.6687 87.9688C42.5437 90.6875 44.5125 91.9063 46.8562 91.9063C49.2 91.9063 50.7 91.0625 52.8562 88.9063C54.45 87.3125 55.6687 85.9063 56.7937 84.9688Z" fill="currentColor"/>
+                </svg>
+            </a>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+                <svg class="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Page Title -->
+        <div class="page-title">
+            <h1>
+                <svg width="42" height="42" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: -0.45rem; margin-right: 0.75rem;">
+                    <rect width="512" height="512" rx="112" fill="#1E3D46"/>
+                    <path d="M122 376V136" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M122 136L390 376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M390 136V376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="255" cy="256" r="34" fill="#C9822B"/>
+                </svg>
+                Nexo
+            </h1>
+            <p>Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.</p>
+        </div>
+
+        <!-- Privacy Banner -->
+        <div class="privacy-banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="white"/>
+                <path d="M10 17l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#059669"/>
+            </svg>
+            <div class="privacy-banner-content">
+                <strong>100% Private & Secure:</strong> All processing happens in your browser. No data is transmitted over the network. This tool works completely offline.
+            </div>
+        </div>
+
+        <!-- Getting Started Section -->
+        <div class="getting-started" id="gettingStarted">
+            <!-- Instructions -->
+            <div class="instructions">
+                <h3>Recommended Workflow (Surgical & Safe)</h3>
+                <ol>
+                    <li>Upload your <strong>unencrypted JSON</strong> vault export to identify duplicates.</li>
+                    <li>Select the items you wish to remove.</li>
+                    <li>Click <strong>"Get CLI Deletion Script"</strong> and run the generated commands.</li>
+                    <li><strong>Why?</strong> This surgically moves items to your <strong>Vault Trash</strong>. Your original records (TOTP, Passkeys, etc.) remain recoverable if needed.</li>
+                </ol>
+
+                <h3 style="margin-top: 1.5rem; opacity: 0.8;">Alternative: JSON Export (For Migrations)</h3>
+                <p style="font-size: 0.75rem; color: var(--fg-muted); margin-bottom: 0.5rem;">
+                    Use this only if importing to a <strong>new/empty vault</strong> or a different password manager (e.g., 1Password, Proton Pass).
+                </p>
+                <div class="warning-box-tight">
+                    <p style="color: var(--warning); font-weight: 600; font-size: 0.75rem; margin-bottom: 0.25rem;">⚠️ Warning:</p>
+                    <p style="color: var(--fg-muted); font-size: 0.7rem; margin: 0;">Importing JSON into a non-empty Bitwarden vault will create massive duplication and require extensive manual cleanup.</p>
+                </div>
+                
+                <p class="shortcuts-text"><strong>Keyboard Shortcuts:</strong> <kbd>Ctrl/Cmd</kbd>+<kbd>O</kbd> Open | <kbd>Ctrl/Cmd</kbd>+<kbd>S</kbd> Export</p>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone" tabindex="0" role="button" aria-label="Upload a Bitwarden JSON export">
+                <div class="upload-zone-header">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: var(--text-muted); margin: 0 auto;">
+                        <path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 15l3 -3l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 12l0 9" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <h2>Drop your Bitwarden JSON export here</h2>
+                    <p>or click to browse files</p>
+                </div>
+                
+                <button class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 13h6m-3-3v6m5.667 3H6.333C5.597 19 5 18.403 5 17.667V6.333C5 5.597 5.597 5 6.333 5h9.334L19 8.333v9.334C19 18.403 18.403 19 17.667 19z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Select File
+                </button>
+
+                <div class="upload-zone-footer"></div>
+                <input type="file" id="fileInput" accept=".json" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Export Instructions -->
+        <div class="export-guide" id="exportGuide">
+            <h3>Step 1: Export your Vault (Unencrypted JSON)</h3>
+            <div class="script-tabs" id="exportTabs">
+                <button class="script-tab active" onclick="switchExportTab('web')">Web Vault</button>
+                <button class="script-tab" onclick="switchExportTab('cli')">Bitwarden CLI</button>
+            </div>
+            
+            <div id="export-web" class="export-content">
+                <ol class="instruction-list">
+                    <li>Log in to your <a href="https://vault.bitwarden.com" target="_blank" style="color: var(--accent);">Bitwarden Web Vault</a>.</li>
+                    <li>Navigate to <strong>Tools</strong> &rarr; <strong>Export Vault</strong>.</li>
+                    <li>Select <strong>.json</strong> as the Format (<strong>Warning:</strong> Do not select Encrypted JSON).</li>
+                    <li>Enter your Master Password and click <strong>Export Vault</strong>.</li>
+                </ol>
+            </div>
+            
+            <div id="export-cli" class="export-content hidden">
+                <ol class="instruction-list">
+                    <li>Open your terminal and login: <code>bw login</code></li>
+                    <li>Unlock your vault: <code>export BW_SESSION="$(bw unlock --raw)"</code> (Bash) or <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)</li>
+                    <li>Run export command: <code>bw export --format json --output vault.json</code></li>
+                    <li>Use the resulting <code>vault.json</code> file in the upload zone below.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <!-- Consolidated Status Bar -->
+            <div class="vault-status-bar">
+                <div class="status-metrics">
+                    <div class="metric">
+                        <span class="metric-value" id="totalItems">0</span>
+                        <span class="metric-label">Vault Items</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="duplicateClusters">0</span>
+                        <span class="metric-label">Clusters</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="markedForDeletion">0</span>
+                        <span class="metric-label">To Delete</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="mergeCandidates">0</span>
+                        <span class="metric-label">To Merge</span>
+                    </div>
+                </div>
+                
+                <div class="status-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="deselectAll()" title="Uncheck all items">
+                        Deselect All
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="selectRecommended()" title="Reset to automatic recommendations">
+                        Select Recommended
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" title="Clear and restart">
+                        Start Over
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="cliScriptBtn" onclick="showCLIScripts()" disabled>
+                        CLI Script
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="exportBtn" onclick="exportCleanedData()" disabled>
+                        Download JSON
+                    </button>
+                </div>
+            </div>
+
+            <!-- No Duplicates Message -->
+            <div class="no-duplicates hidden" id="noDuplicatesMsg">
+                <h2>✓ No Duplicates Found!</h2>
+                <p>Your Bitwarden vault is clean.</p>
+            </div>
+
+            <!-- Clusters Container -->
+            <div class="clusters-container" id="clustersContainer">
+                <!-- Clusters will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Merge Preview Modal -->
+        <div class="modal-overlay" id="mergeModal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3>Review & Synthesize Merge</h3>
+                    <button class="modal-close" onclick="closeMergeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 1.5rem;">
+                        This will create a new <strong>Union Record</strong> containing all unique data from this cluster. 
+                        The original items will be marked for deletion.
+                    </p>
+                    <div id="mergePreviewContent"></div>
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="closeMergeModal()">Cancel</button>
+                        <button class="btn btn-primary" id="confirmMergeBtn">Approve & Merge</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLI Script Modal -->
+        <div class="modal-overlay" id="cliScriptModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Bitwarden CLI Deletion Scripts</h3>
+                    <button class="modal-close" onclick="closeCLIModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="script-instructions">
+                        <h4>How to use these scripts:</h4>
+                        <ol>
+                            <li>Install <a href="https://bitwarden.com/help/cli/" target="_blank" style="color: var(--accent-primary);">Bitwarden CLI</a> if you haven't already</li>
+                            <li>Login to your vault: <code>bw login</code></li>
+                            <li>Unlock your vault and set session: <code>export BW_SESSION="$(bw unlock --raw)"</code> (Bash) or <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)</li>
+                            <li>Copy the script below and run it in your terminal</li>
+                            <li>The script will delete the selected items directly from your vault</li>
+                        </ol>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.8125rem; color: var(--text-tertiary);"><strong>Note:</strong> This approach is cleaner than re-importing your entire vault as it deletes items directly without creating duplicates.</p>
+                    </div>
+
+                    <div class="script-tabs">
+                        <button class="script-tab active" onclick="switchScriptTab('bash')">Bash</button>
+                        <button class="script-tab" onclick="switchScriptTab('powershell')">PowerShell</button>
+                    </div>
+
+                    <div class="script-content active" id="bashScript">
+                        <div class="script-box">
+                            <button class="copy-btn" onclick="copyScript('bash')">Copy</button>
+                            <textarea id="bashScriptText" readonly></textarea>
+                        </div>
+                    </div>
+
+                    <div class="script-content" id="powershellScript">
+                        <div class="script-box">
+                            <button class="copy-btn" onclick="copyScript('powershell')">Copy</button>
+                            <textarea id="powershellScriptText" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer Disclaimer -->
+        <footer class="footer-disclaimer">
+            <p>
+                <strong>⚠️ DISCLAIMER & LIABILITY WARNING:</strong> This utility is provided "as is" without warranty of any kind. 
+                The creators cannot be held liable for inadvertent deletion of records. 
+                Maintain a secure, original backup of your vault before proceeding. You use this tool at your own risk.
+            </p>
+            <p>
+                <strong>LEGAL NOTICE:</strong> Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.
+            </p>
+        </footer>
+
+        <!-- Back to Top -->
+        <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Back to top">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+    </div>
+
+    <script>
+        'use strict';
+
+        // ===== APPLICATION STATE =====
+        // These arrays mirror the currently loaded Bitwarden export and drive all UI output.
+        // Keeping the data model centralized makes later feature work much easier to reason about.
+        let originalData = null;
+        let folders = [];
+        let items = [];
+        let duplicateClusters = [];
+        let itemsToDelete = new Set();
+        const THEME_STORAGE_KEY = 'nexo-theme';
+
+        // ===== APPLICATION BOOTSTRAP =====
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        function initializeApp() {
+            initTheme();
+            detectBrowserExtensions();
+            setupEventListeners();
+            setupKeyboardShortcuts();
+            setupScrollListener();
+        }
+
+        /**
+         * Clear the derived analysis state without touching the current file input.
+         * Use this before loading a new vault so old selections or clusters cannot leak into the new run.
+         */
+        function resetAnalysisState() {
+            folders = [];
+            items = [];
+            duplicateClusters = [];
+            itemsToDelete = new Set();
+        }
+
+        /**
+         * Keep the card state and checkbox state in sync from one place.
+         * This avoids a class/checkbox drift when multiple actions update the same item.
+         * @param {string} itemId - Item UUID
+         * @param {boolean} isMarked - Whether the item should be marked for deletion
+         */
+        function setItemMarkedState(itemId, isMarked) {
+            if (isMarked) {
+                itemsToDelete.add(itemId);
+            } else {
+                itemsToDelete.delete(itemId);
+            }
+
+            const card = document.getElementById(`item-${itemId}`);
+            if (!card) return;
+
+            card.classList.toggle('marked-delete', isMarked);
+
+            const checkbox = card.querySelector('.item-delete-checkbox');
+            if (checkbox) {
+                checkbox.checked = isMarked;
+            }
+        }
+
+        /**
+         * Setup scroll listener for 'Back to Top' button
+         */
+        function setupScrollListener() {
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 300) {
+                    backToTop.classList.add('show');
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            });
+        }
+
+        /**
+         * Scroll smoothly to top
+         */
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        /**
+         * Setup all event listeners for file input
+         */
+        function setupEventListeners() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            // Drag and drop
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput.click();
+                }
+            });
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+
+            // Click-to-copy for code elements
+            document.addEventListener('click', (e) => {
+                const codeElement = e.target.closest('code');
+                if (codeElement) {
+                    copyToClipboard(codeElement.innerText, codeElement);
+                }
+            });
+        }
+
+        /**
+         * Copy arbitrary text to the clipboard with a clipboard-API fallback.
+         * @param {string} text - Text to copy
+         * @returns {Promise<void>} - Resolves when copy succeeds
+         */
+        async function copyTextToClipboard(text) {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = text;
+            tempTextarea.setAttribute('readonly', '');
+            tempTextarea.style.position = 'absolute';
+            tempTextarea.style.left = '-9999px';
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+        }
+
+        /**
+         * Copy text to clipboard with visual feedback
+         */
+        function copyToClipboard(text, element) {
+            copyTextToClipboard(text).then(() => {
+                if (element) {
+                    element.classList.add('copied-flash');
+                    setTimeout(() => {
+                        element.classList.remove('copied-flash');
+                    }, 1500);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        /**
+         * Setup keyboard shortcuts
+         */
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + O: Open file
+                if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+                    e.preventDefault();
+                    document.getElementById('fileInput').click();
+                }
+                
+                // Ctrl/Cmd + S: Export data
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    const exportBtn = document.getElementById('exportBtn');
+                    if (!exportBtn.disabled) {
+                        exportCleanedData();
+                    }
+                }
+
+                // Escape: Close modal
+                if (e.key === 'Escape') {
+                    closeCLIModal();
+                    closeMergeModal();
+                }
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('cliScriptModal').addEventListener('click', (e) => {
+                if (e.target.id === 'cliScriptModal') {
+                    closeCLIModal();
+                }
+            });
+
+            document.getElementById('mergeModal').addEventListener('click', (e) => {
+                if (e.target.id === 'mergeModal') {
+                    closeMergeModal();
+                }
+            });
+        }
+
+        /**
+         * Detect browser extensions that might read page data
+         * This is a basic detection - extensions can hide themselves
+         */
+        function detectBrowserExtensions() {
+            const warningDiv = document.getElementById('extensionWarning');
+            const detectedList = document.getElementById('detectedExtensions');
+            const extensionsFound = [];
+
+            // The warning UI is optional. If the markup is not present, skip detection silently.
+            if (!warningDiv || !detectedList) {
+                return;
+            }
+
+            // Check for common extension indicators
+            // Note: This is heuristic-based and may not catch all extensions
+            try {
+                // Chrome/Edge extension detection
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                    extensionsFound.push('Chrome/Edge extensions detected');
+                }
+
+                // Firefox extension detection
+                if (typeof browser !== 'undefined' && browser.runtime) {
+                    extensionsFound.push('Firefox add-ons detected');
+                }
+
+                // Check for modified fetch/XMLHttpRequest (common in extensions)
+                const originalFetch = window.fetch.toString();
+                if (!originalFetch.includes('[native code]')) {
+                    extensionsFound.push('Modified network functions detected (possible extension)');
+                }
+            } catch (e) {
+                console.error('Extension detection error:', e);
+            }
+
+            // Show warning if extensions detected
+            if (extensionsFound.length > 0) {
+                warningDiv.classList.add('show');
+                detectedList.innerHTML = '<strong>Detected:</strong> ' + extensionsFound.join(', ');
+            }
+        }
+
+        /**
+         * Handle file upload and processing
+         * @param {File} file - The uploaded file
+         */
+        function handleFileUpload(file) {
+            if (!file.name.endsWith('.json')) {
+                alert('❌ Error: Please upload a JSON file');
+                return;
+            }
+
+            showLoading(true);
+
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                try {
+                    const content = e.target.result;
+                    parseAndAnalyzeData(content);
+                } catch (error) {
+                    console.error('File processing error:', error);
+                    alert('❌ Error processing file: ' + error.message);
+                    showLoading(false);
+                }
+            };
+
+            reader.onerror = () => {
+                alert('❌ Error reading file');
+                showLoading(false);
+            };
+
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parse and analyze Bitwarden JSON data
+         * @param {string} jsonContent - Raw JSON content
+         */
+        function parseAndAnalyzeData(jsonContent) {
+            try {
+                // Parse JSON
+                const data = JSON.parse(jsonContent);
+                
+                // Validate Bitwarden format
+                if (!validateBitwardenFormat(data)) {
+                    return;
+                }
+
+                // Loading a new vault should always start from a clean derived state.
+                resetAnalysisState();
+
+                // Store original data for export
+                originalData = data;
+                folders = data.folders || [];
+                
+                // Build a UI-safe mirror of the raw vault data.
+                // The source export stays in memory locally and is never transmitted.
+                items = parseItemsSafely(data.items || []);
+                
+                // Find duplicates
+                duplicateClusters = findDuplicates(items);
+                
+                // Render results
+                renderClusters();
+                updateStats();
+                scrollToResults();
+
+                showLoading(false);
+            } catch (error) {
+                console.error('JSON parsing error:', error);
+                alert('❌ Error: Invalid JSON file. Please ensure this is a valid Bitwarden export.');
+                showLoading(false);
+            }
+        }
+
+        /**
+         * Validate Bitwarden export format
+         * @param {Object} data - Parsed JSON data
+         * @returns {boolean} - True if valid
+         */
+        function validateBitwardenFormat(data) {
+            // Check if encrypted
+            if (data.encrypted === true) {
+                alert('❌ Error: Encrypted exports are not supported.\n\n' +
+                      'Please export your vault as UNENCRYPTED JSON:\n' +
+                      '1. In Bitwarden, go to Tools → Export Vault\n' +
+                      '2. Set File Format to ".json" (not .json (Encrypted))\n' +
+                      '3. Export and upload the file here');
+                showLoading(false);
+                return false;
+            }
+
+            // Check required fields
+            if (!data.hasOwnProperty('folders') || !data.hasOwnProperty('items')) {
+                alert('❌ Error: This doesn\'t appear to be a valid Bitwarden export.\n\n' +
+                      'Missing required fields: folders or items array.');
+                showLoading(false);
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Parse raw Bitwarden items into a simplified UI model.
+         * The UI model keeps the fields we need for matching and presentation while leaving the
+         * original export untouched for later download or merge actions.
+         * @param {Array} rawItems - Raw items array from JSON
+         * @returns {Array} - Parsed items for UI use
+         */
+        function parseItemsSafely(rawItems) {
+            return rawItems.map((item, index) => createSafeItem(item, index));
+        }
+
+        /**
+         * Create a single UI-safe item shape from a raw Bitwarden item.
+         * This helper is reused during initial parsing and after synthetic merges are added.
+         * @param {Object} item - Raw Bitwarden item
+         * @param {number} index - Source index inside originalData.items
+         * @returns {Object} - Simplified item for rendering and duplicate logic
+         */
+        function createSafeItem(item, index) {
+            const safeItem = {
+                id: item.id || `item-${index}`,
+                folderId: item.folderId || null,
+                type: item.type || 1, // 1=login, 2=note, 3=card, 4=identity
+                name: item.name || 'Unnamed Item',
+                notes: item.notes || null,
+                favorite: item.favorite || false,
+                creationDate: item.creationDate || null,
+                revisionDate: item.revisionDate || null,
+
+                // Metadata used in scoring and merge suggestions
+                hasPasswordHistory: Array.isArray(item.passwordHistory) && item.passwordHistory.length > 0,
+                passwordHistoryCount: Array.isArray(item.passwordHistory) ? item.passwordHistory.length : 0,
+                hasCustomFields: Array.isArray(item.fields) && item.fields.length > 0,
+                customFieldsCount: Array.isArray(item.fields) ? item.fields.length : 0,
+
+                // Login fields
+                username: null,
+                uris: [],
+                hasPassword: false,
+                hasTOTP: false,
+                hasFido2: false,
+                password: null,
+                maskedPassword: null,
+
+                // Card fields (Type 3)
+                card: item.card ? {
+                    number: item.card.number || null,
+                    brand: item.card.brand || null,
+                    expMonth: item.card.expMonth || null,
+                    expYear: item.card.expYear || null
+                } : null,
+
+                // Identity fields (Type 4)
+                identity: item.identity ? {
+                    firstName: item.identity.firstName || null,
+                    lastName: item.identity.lastName || null,
+                    email: item.identity.email || null,
+                    username: item.identity.username || null
+                } : null,
+
+                originalIndex: index
+            };
+
+            if (item.type === 1 && item.login) {
+                safeItem.username = item.login.username || null;
+                safeItem.hasTOTP = !!item.login.totp;
+                safeItem.hasFido2 = Array.isArray(item.login.fido2Credentials) && item.login.fido2Credentials.length > 0;
+
+                if (Array.isArray(item.login.uris)) {
+                    safeItem.uris = item.login.uris.map(uriEntry => uriEntry.uri).filter(Boolean);
+                }
+
+                if (item.login.password) {
+                    safeItem.password = item.login.password;
+                    safeItem.maskedPassword = maskPassword(item.login.password);
+                    safeItem.hasPassword = true;
+                }
+            }
+
+            return safeItem;
+        }
+
+        /**
+         * Mask password for display (A****wxyz format)
+         * @param {string} password - Raw password
+         * @returns {string} - Masked password
+         */
+        function maskPassword(password) {
+            if (!password) return '';
+            
+            const len = password.length;
+            
+            // If 5 or fewer characters, mask all with *
+            if (len <= 5) {
+                return '*'.repeat(len);
+            }
+            
+            // Show first char + **** + last 4 chars
+            const first = password[0];
+            const last4 = password.slice(-4);
+            const middle = '*'.repeat(Math.max(1, len - 5));
+            
+            return first + middle + last4;
+        }
+
+        /**
+         * Find duplicate items using weighted scoring and primary key grouping
+         * @param {Array} items - Array of safe items
+         * @returns {Array} - Array of duplicate clusters
+         */
+        function findDuplicates(items) {
+            const clusters = [];
+            
+            // Group by Primary Keys (Login: Username+URI, Card: Number, Identity: Email)
+            const groups = {
+                login: {},
+                card: {},
+                identity: {},
+                nameOnly: {} // Fallback for items with no primary key
+            };
+
+            items.forEach(item => {
+                if (item.type === 1) { // Login
+                    const domain = item.uris.length > 0 ? extractDomain(item.uris[0]) : 'no-uri';
+                    const user = normalizeUsername(item.username) || 'no-user';
+                    const key = `${user}|${domain}`;
+                    if (!groups.login[key]) groups.login[key] = [];
+                    groups.login[key].push(item);
+                } else if (item.type === 3 && item.card) { // Card
+                    const key = item.card.number || 'no-number';
+                    if (!groups.card[key]) groups.card[key] = [];
+                    groups.card[key].push(item);
+                } else if (item.type === 4 && item.identity) { // Identity
+                    const key = normalizeUsername(item.identity.email) || 'no-email';
+                    if (!groups.identity[key]) groups.identity[key] = [];
+                    groups.identity[key].push(item);
+                } else {
+                    const key = item.name.toLowerCase().trim();
+                    if (!groups.nameOnly[key]) groups.nameOnly[key] = [];
+                    groups.nameOnly[key].push(item);
+                }
+            });
+
+            // Analyze each group to create clusters
+            [groups.login, groups.card, groups.identity, groups.nameOnly].forEach(category => {
+                Object.entries(category).forEach(([key, groupItems]) => {
+                    if (groupItems.length < 2) return;
+                    
+                    // Skip 'no-key' catch-alls for automatic clustering
+                    if (key.includes('no-user') || key.includes('no-uri') || key.includes('no-number') || key.includes('no-email')) {
+                        // For these, only cluster if Name is also identical
+                        const nameSubgroups = {};
+                        groupItems.forEach(item => {
+                            const nKey = item.name.toLowerCase().trim();
+                            if (!nameSubgroups[nKey]) nameSubgroups[nKey] = [];
+                            nameSubgroups[nKey].push(item);
+                        });
+                        Object.values(nameSubgroups).forEach(sub => {
+                            if (sub.length >= 2) clusters.push(createCluster(sub));
+                        });
+                    } else {
+                        clusters.push(createCluster(groupItems));
+                    }
+                });
+            });
+
+            return clusters;
+        }
+
+        /**
+         * Create a cluster with calculated divergence and suggestions
+         */
+        function createCluster(groupItems) {
+            const cluster = {
+                items: groupItems,
+                matchCriteria: ['Identity Match'],
+                hasConflict: false,
+                mergeCandidate: false
+            };
+
+            // Pairwise comparison for divergence and conflicts
+            for (let i = 0; i < groupItems.length; i++) {
+                for (let j = i + 1; j < groupItems.length; j++) {
+                    const a = groupItems[i];
+                    const b = groupItems[j];
+
+                    // Check for Password Conflict
+                    if (a.hasPassword && b.hasPassword && a.password !== b.password) {
+                        cluster.hasConflict = true;
+                    }
+
+                    // Check for Merge Candidate (Complementary data)
+                    const hasUriDifference = haveDifferentUris(a.uris, b.uris);
+                    const hasNotesDifference = Boolean(a.notes) !== Boolean(b.notes);
+
+                    if ((a.hasTOTP && !b.hasTOTP) || (!a.hasTOTP && b.hasTOTP) ||
+                        (a.hasFido2 && !b.hasFido2) || (!a.hasFido2 && b.hasFido2) ||
+                        (a.hasCustomFields && !b.hasCustomFields) || (!a.hasCustomFields && b.hasCustomFields) ||
+                        hasUriDifference || hasNotesDifference) {
+                        cluster.mergeCandidate = true;
+                    }
+                }
+            }
+
+            // Auto-selection logic
+            rankAndSuggest(cluster);
+
+            return cluster;
+        }
+
+        /**
+         * Rank items in cluster and suggest deletions
+         */
+        function rankAndSuggest(cluster) {
+            if (cluster.hasConflict) return; // Never auto-suggest on password mismatch
+
+            // 1. Detect special conditions that prevent auto-suggestion
+            const usernames = cluster.items.map(i => normalizeUsername(i.username));
+            const baseUsernames = usernames.map(u => u.replace(/\s*\(.*?\)\s*$/, '').trim());
+            const hasSSOSuffixMatches = new Set(baseUsernames).size < baseUsernames.length && new Set(usernames).size > 1;
+            
+            const names = cluster.items.map(i => i.name.toLowerCase().trim());
+            const hasURLNameDivergence = names.some(n => n.includes('.') && names.some(m => !m.includes('.') && m.split(' ')[0] === n.split('.')[0]));
+
+            // 2. Sort items by 'Mastery' score (Completeness + Role)
+            const ranked = [...cluster.items].sort((a, b) => {
+                let scoreA = calculateCompleteness(a) + (a.favorite ? 10 : 0) + (a.hasPasswordHistory ? 5 : 0);
+                let scoreB = calculateCompleteness(b) + (b.favorite ? 10 : 0) + (b.hasPasswordHistory ? 5 : 0);
+                
+                // Native folder priority
+                const isImportA = isImportFolder(a.folderId);
+                const isImportB = isImportFolder(b.folderId);
+                if (isImportA && !isImportB) scoreA -= 20;
+                if (!isImportA && isImportB) scoreB -= 20;
+
+                if (scoreA !== scoreB) return scoreB - scoreA;
+                return new Date(b.revisionDate) - new Date(a.revisionDate);
+            });
+
+            const master = ranked[0];
+            
+            // 3. Mark others for deletion ONLY if they meet the safety criteria
+            ranked.slice(1).forEach(item => {
+                // Rule: Don't auto-suggest if names are just URL vs Display Name divergence
+                if (hasURLNameDivergence) return;
+                
+                // Rule: Don't auto-suggest if it's an SSO suffix match (user must choose)
+                if (hasSSOSuffixMatches) return;
+
+                // Rule: Auto-suggest if it's in an import folder vs a native one
+                const isImportItem = isImportFolder(item.folderId);
+                const isMasterNative = !isImportFolder(master.folderId);
+                
+                if ((isImportItem && isMasterNative) || isStub(item, master)) {
+                    itemsToDelete.add(item.id);
+                }
+            });
+        }
+
+        /**
+         * Determine if record A is a subset (stub) of record B
+         */
+        function isStub(a, b) {
+            // Cannot be a stub if it has a unique high-value factor
+            if (a.hasTOTP && !b.hasTOTP) return false;
+            if (a.hasFido2 && !b.hasFido2) return false;
+            if (a.hasCustomFields && !b.hasCustomFields) return false;
+            if (a.hasPasswordHistory && !b.hasPasswordHistory) return false;
+            if (a.favorite && !b.favorite) return false;
+
+            // The master must actually contain every meaningful value already present on the candidate.
+            if (normalizeUsername(a.username) && normalizeUsername(a.username) !== normalizeUsername(b.username)) return false;
+            if (a.hasPassword && (!b.hasPassword || a.password !== b.password)) return false;
+            if (!containsAllValues(a.uris, b.uris, normalizeComparableValue)) return false;
+            if (a.notes && !containsComparableText(b.notes, a.notes)) return false;
+
+            if (a.card) {
+                if (!cardContains(a.card, b.card)) return false;
+            }
+
+            if (a.identity) {
+                if (!identityContains(a.identity, b.identity)) return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Extract domain from URI (normalize protocol, www, etc.)
+         * @param {string} uri - Full URI
+         * @returns {string|null} - Normalized domain
+         */
+        function extractDomain(uri) {
+            if (!uri) return null;
+
+            try {
+                // Handle relative URIs
+                if (!uri.includes('://')) {
+                    uri = 'http://' + uri;
+                }
+
+                const url = new URL(uri);
+                let domain = url.hostname.toLowerCase();
+
+                // Remove www.
+                domain = domain.replace(/^www\./, '');
+
+                return domain;
+            } catch (e) {
+                // If URL parsing fails, try simple extraction
+                const match = uri.match(/(?:https?:\/\/)?(?:www\.)?([^\/\?:#]+)/i);
+                return match ? match[1].toLowerCase() : null;
+            }
+        }
+
+        /**
+         * Normalize username for comparison
+         * @param {string} username - Raw username
+         * @returns {string} - Normalized username
+         */
+        function normalizeUsername(username) {
+            if (!username) return '';
+            return username.toLowerCase().trim();
+        }
+
+        /**
+         * Normalize arbitrary scalar values before set/subset comparison.
+         * @param {string|null|undefined} value - Value to normalize
+         * @returns {string} - Lowercased comparable value
+         */
+        function normalizeComparableValue(value) {
+            return String(value || '').trim().toLowerCase();
+        }
+
+        function containsAllValues(sourceValues, targetValues, normalizer = normalizeComparableValue) {
+            const targetSet = new Set(targetValues.map(normalizer));
+            return sourceValues.every(value => targetSet.has(normalizer(value)));
+        }
+
+        function containsComparableText(fullText, candidateText) {
+            return normalizeComparableValue(fullText).includes(normalizeComparableValue(candidateText));
+        }
+
+        function haveDifferentUris(firstUris, secondUris) {
+            const firstSet = new Set(firstUris.map(normalizeComparableValue));
+            const secondSet = new Set(secondUris.map(normalizeComparableValue));
+
+            if (firstSet.size !== secondSet.size) return true;
+
+            for (const uri of firstSet) {
+                if (!secondSet.has(uri)) return true;
+            }
+
+            return false;
+        }
+
+        function isImportFolder(folderId) {
+            return getFolderName(folderId).toLowerCase().includes('import');
+        }
+
+        function cardContains(sourceCard, targetCard) {
+            if (!sourceCard) return true;
+            if (!targetCard) return false;
+
+            const cardFields = ['number', 'brand', 'expMonth', 'expYear'];
+            return cardFields.every(field => {
+                if (!sourceCard[field]) return true;
+                return normalizeComparableValue(sourceCard[field]) === normalizeComparableValue(targetCard[field]);
+            });
+        }
+
+        function identityContains(sourceIdentity, targetIdentity) {
+            if (!sourceIdentity) return true;
+            if (!targetIdentity) return false;
+
+            const identityFields = ['firstName', 'lastName', 'email', 'username'];
+            return identityFields.every(field => {
+                if (!sourceIdentity[field]) return true;
+                return normalizeComparableValue(sourceIdentity[field]) === normalizeComparableValue(targetIdentity[field]);
+            });
+        }
+
+        /**
+         * Preview a potential merge of items in a cluster
+         * @param {number} clusterIndex - Cluster index
+         */
+        function previewMerge(clusterIndex) {
+            const cluster = duplicateClusters[clusterIndex];
+            const modal = document.getElementById('mergeModal');
+            const content = document.getElementById('mergePreviewContent');
+            const confirmBtn = document.getElementById('confirmMergeBtn');
+
+            // Synthesize the merged record (preview only)
+            const synthesized = synthesizeRecord(cluster.items);
+
+            content.innerHTML = `
+                <div class="item-card" style="border-color: var(--teal-mid); background: var(--bg-muted);">
+                    <div class="item-name">${escapeHtml(synthesized.name)}</div>
+                    <div class="item-details" style="margin-top: 1rem;">
+                        <div class="item-detail">
+                            <span class="detail-label">User:</span>
+                            <span class="detail-value">${escapeHtml(synthesized.username || '(none)')}</span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">URIs:</span>
+                            <span class="detail-value">${synthesized.uris.length} URI(s) consolidated</span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Security:</span>
+                            <div class="metadata-tags">
+                                <span class="meta-tag ${synthesized.hasPassword ? 'present' : 'absent'}">Pass</span>
+                                <span class="meta-tag ${synthesized.hasTOTP ? 'present' : 'absent'}">TOTP</span>
+                                <span class="meta-tag ${synthesized.hasFido2 ? 'present' : 'absent'}">FIDO2</span>
+                            </div>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Folder:</span>
+                            <span class="detail-value">[ MERGED ]</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            confirmBtn.onclick = () => executeMerge(clusterIndex, synthesized);
+            modal.classList.add('show');
+        }
+
+        /**
+         * Synthesize multiple items into a single union record
+         */
+        function synthesizeRecord(groupItems) {
+            // Use the newest record as the base
+            const base = [...groupItems].sort((a, b) => new Date(b.revisionDate) - new Date(a.revisionDate))[0];
+            
+            const union = {
+                ...base,
+                id: generateUUID(),
+                name: base.name,
+                username: base.username,
+                password: base.password,
+                uris: [],
+                notes: '',
+                hasTOTP: false,
+                hasFido2: false,
+                hasPassword: !!base.password
+            };
+
+            // Aggregate all unique URIs
+            const allURIs = new Set();
+            groupItems.forEach(item => {
+                item.uris.forEach(u => allURIs.add(u));
+                if (item.notes) {
+                    if (union.notes && !union.notes.includes(item.notes)) {
+                        union.notes += `\n---\n${item.notes}`;
+                    } else if (!union.notes) {
+                        union.notes = item.notes;
+                    }
+                }
+                if (item.hasTOTP) union.hasTOTP = true;
+                if (item.hasFido2) union.hasFido2 = true;
+            });
+            union.uris = Array.from(allURIs);
+
+            return union;
+        }
+
+        /**
+         * Commit the merge: Add new record and mark originals for deletion
+         */
+        function executeMerge(clusterIndex, synthesized) {
+            const cluster = duplicateClusters[clusterIndex];
+            
+            // 1. Ensure [ MERGED ] folder exists in originalData
+            let mergeFolder = originalData.folders.find(f => f.name === '[ MERGED ]');
+            if (!mergeFolder) {
+                const folderId = generateUUID();
+                mergeFolder = { name: '[ MERGED ]', id: folderId };
+                originalData.folders.push(mergeFolder);
+                folders = originalData.folders;
+            }
+
+            // 2. Prepare the full Bitwarden object for the synthesized record
+            const newRecord = JSON.parse(JSON.stringify(originalData.items[cluster.items[0].originalIndex]));
+            newRecord.id = synthesized.id;
+            newRecord.folderId = mergeFolder.id;
+            newRecord.name = synthesized.name;
+            newRecord.notes = synthesized.notes;
+            newRecord.isNexoMerge = true; // Tag for CLI script generation
+            
+            // Add all unique URIs back to the real object
+            if (newRecord.login) {
+                const uniqueURIs = [];
+                const uriStrings = new Set();
+                cluster.items.forEach(item => {
+                    const originalItem = originalData.items[item.originalIndex];
+                    if (originalItem.login && originalItem.login.uris) {
+                        originalItem.login.uris.forEach(uObj => {
+                            if (!uriStrings.has(uObj.uri)) {
+                                uriStrings.add(uObj.uri);
+                                uniqueURIs.push(uObj);
+                            }
+                        });
+                    }
+                });
+                newRecord.login.uris = uniqueURIs;
+                
+                // Pick the item with TOTP to copy the secret
+                const itemWithTOTP = cluster.items.find(i => i.hasTOTP);
+                if (itemWithTOTP) {
+                    newRecord.login.totp = originalData.items[itemWithTOTP.originalIndex].login.totp;
+                }
+            }
+
+            // 3. Add to vault
+            originalData.items.push(newRecord);
+            items.push(createSafeItem(newRecord, originalData.items.length - 1));
+            
+            // 4. Mark originals for deletion
+            cluster.items.forEach(item => setItemMarkedState(item.id, true));
+
+            // 5. Refresh UI
+            closeMergeModal();
+            renderClusters();
+            updateStats();
+            alert('✓ Record synthesized and originals marked for deletion.');
+        }
+
+        function closeMergeModal() {
+            document.getElementById('mergeModal').classList.remove('show');
+        }
+
+        /**
+         * Render duplicate clusters
+         */
+        function renderClusters() {
+            const container = document.getElementById('clustersContainer');
+            container.innerHTML = '';
+
+            duplicateClusters.forEach((cluster, clusterIndex) => {
+                const clusterDiv = document.createElement('div');
+                clusterDiv.className = 'cluster';
+                
+                let extraTags = '';
+                if (cluster.hasConflict) {
+                    extraTags += `<span class="match-tag tag-conflict">⚠️ Password Conflict</span>`;
+                }
+                if (cluster.mergeCandidate && !cluster.hasConflict) {
+                    extraTags += `<span class="match-tag tag-merge">🧬 Merge Candidate</span>`;
+                }
+
+                clusterDiv.innerHTML = `
+                    <div class="cluster-header">
+                        <div>
+                            <div class="cluster-title">
+                                Cluster ${clusterIndex + 1}
+                                <div class="match-tags">
+                                    ${cluster.matchCriteria.map(c => `<span class="match-tag">${c}</span>`).join('')}
+                                    ${extraTags}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cluster-actions">
+                            ${cluster.mergeCandidate && !cluster.hasConflict ? `
+                                <button class="btn btn-primary btn-sm" onclick="previewMerge(${clusterIndex})" style="background: var(--teal-mid);">
+                                    Review & Merge
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-secondary btn-sm" onclick="keepNewestInCluster(${clusterIndex})">Keep Newest</button>
+                            <button class="btn btn-secondary btn-sm" onclick="selectAllInCluster(${clusterIndex})">Select All</button>
+                        </div>
+                    </div>
+                    <div class="items-grid">
+                        ${cluster.items.map((item, itemIndex) => renderItemCard(item, clusterIndex, itemIndex, cluster)).join('')}
+                    </div>
+                `;
+                container.appendChild(clusterDiv);
+            });
+        }
+
+        /**
+         * Render individual item card
+         * @param {Object} item - Item data
+         * @param {number} clusterIndex - Cluster index
+         * @param {number} itemIndex - Item index within cluster
+         * @returns {string} - HTML string
+         */
+        function renderItemCard(item, clusterIndex, itemIndex, cluster) {
+            const folderName = getFolderName(item.folderId);
+            const typeName = getTypeName(item.type);
+            const completeness = calculateCompleteness(item);
+            const isMarked = itemsToDelete.has(item.id);
+
+            // Metadata presence checks
+            const hasName = item.name && item.name !== 'Unnamed Item';
+            const hasUser = !!item.username;
+            const hasPass = item.hasPassword;
+            const hasURI = item.uris.length > 0;
+            const hasNotes = !!item.notes;
+            const hasTOTP = !!item.hasTOTP;
+            const hasFido2 = !!item.hasFido2;
+
+            // Divergence Detection (≠)
+            const checkDivergence = (field, value) => {
+                const otherValues = cluster.items
+                    .filter(i => i.id !== item.id)
+                    .map(i => {
+                        if (field === 'uri') return i.uris.length > 0 ? extractDomain(i.uris[0]) : null;
+                        return i[field];
+                    });
+                
+                const hasMismatch = otherValues.some(v => v !== null && v !== undefined && v !== value);
+                return hasMismatch ? `<span class="divergence-icon" title="Field differs between records">≠</span>` : '';
+            };
+
+            const userDiv = checkDivergence('username', item.username);
+            const uriDiv = checkDivergence('uri', item.uris.length > 0 ? extractDomain(item.uris[0]) : null);
+            const passDiv = checkDivergence('password', item.password);
+            const noteDiv = checkDivergence('notes', item.notes);
+
+            return `
+                <div class="item-card ${isMarked ? 'marked-delete' : ''}" id="item-${item.id}">
+                    <div class="item-card-header">
+                        <div>
+                            <div class="item-name ${checkDivergence('name', item.name) ? 'divergent-value' : ''}">${escapeHtml(item.name)}</div>
+                            <span class="item-type-badge">${typeName}</span>
+                        </div>
+                        <div class="item-delete-control">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M9 3h6m-9 4h12m-1 0-.7 10.1A2 2 0 0 1 14.3 19H9.7a2 2 0 0 1-1.99-1.9L7 7m3 4v4m4-4v4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <input 
+                                type="checkbox" 
+                                class="item-delete-checkbox" 
+                                ${isMarked ? 'checked' : ''}
+                                onchange="toggleItemDeletion('${item.id}')"
+                                title="Mark for deletion"
+                                aria-label="Mark item for deletion"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="item-details">
+                        <div class="item-detail">
+                            <span class="detail-label">Username:</span>
+                            <span class="detail-value ${item.username ? '' : 'detail-value-muted'} ${userDiv ? 'divergent-value' : ''}">
+                                ${item.username ? escapeHtml(item.username) : '(none)'} ${userDiv}
+                            </span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Folder:</span>
+                            <span class="detail-value ${folderName ? '' : 'detail-value-muted'}">
+                                ${folderName ? escapeHtml(folderName) : '(none)'}
+                            </span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">URIs:</span>
+                            <span class="detail-value ${uriDiv ? 'divergent-value' : ''}">
+                                ${item.uris.length > 0 ? `
+                                    <ul class="uri-list">
+                                        ${item.uris.map(uri => `<li>${escapeHtml(uri)}</li>`).join('')}
+                                    </ul>
+                                ` : '<span class="detail-value-muted">(none)</span>'} ${uriDiv}
+                            </span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Password:</span>
+                            <span class="detail-value">
+                                ${item.hasPassword ? `
+                                    <div class="password-container ${passDiv ? 'divergent-value' : ''}">
+                                        <span class="password-value" id="pwd-${item.id}" data-masked="true">${escapeHtml(item.maskedPassword)}</span>
+                                        <button class="password-toggle" onclick="togglePasswordVisibility('${item.id}')" title="Toggle password visibility">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        ${passDiv}
+                                    </div>
+                                ` : '<span class="detail-value-muted">✗ None</span>'}
+                            </span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Created:</span>
+                            <span class="detail-value">
+                                ${item.creationDate ? formatDate(item.creationDate) : '<span class="detail-value-muted">(unknown)</span>'}
+                            </span>
+                        </div>
+                        <div class="item-detail">
+                            <span class="detail-label">Modified:</span>
+                            <span class="detail-value">
+                                ${item.revisionDate ? formatDate(item.revisionDate) : '<span class="detail-value-muted">(unknown)</span>'}
+                            </span>
+                        </div>
+                        ${item.notes ? `
+                            <div class="item-detail">
+                                <span class="detail-label">Notes:</span>
+                                <span class="detail-value ${noteDiv ? 'divergent-value' : ''}">${escapeHtml(item.notes)}... ${noteDiv}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="metadata-tags">
+                        <span class="meta-tag ${hasName ? 'present' : 'absent'}">Name</span>
+                        <span class="meta-tag ${hasUser ? 'present' : 'absent'}">User</span>
+                        <span class="meta-tag ${hasPass ? 'present' : 'absent'}">Pass</span>
+                        <span class="meta-tag ${hasURI ? 'present' : 'absent'}">URI</span>
+                        <span class="meta-tag ${hasNotes ? 'present' : 'absent'}">Notes</span>
+                        <span class="meta-tag ${hasTOTP ? 'present' : 'absent'}" style="${hasTOTP ? 'background: #eff6ff; color: #1d4ed8; border-color: #1d4ed8;' : ''}">TOTP</span>
+                        <span class="meta-tag ${hasFido2 ? 'present' : 'absent'}" style="${hasFido2 ? 'background: #fdf2f8; color: #be185d; border-color: #be185d;' : ''}">FIDO2</span>
+                    </div>
+
+                    <div class="completeness-score">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-ghost);">Vault Health</span>
+                            <span style="font-size: 11px; font-weight: 700; color: var(--accent);">${completeness}%</span>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: ${completeness}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Calculate completeness score for an item
+         * @param {Object} item - Item data
+         * @returns {number} - Completeness percentage
+         */
+        function calculateCompleteness(item) {
+            let score = 0;
+            const maxScore = 5;
+
+            if (item.name && item.name !== 'Unnamed Item') score++;
+            if (item.username) score++;
+            if (item.hasPassword) score++;
+            if (item.uris.length > 0) score++;
+            if (item.notes) score++;
+
+            return Math.round((score / maxScore) * 100);
+        }
+
+        /**
+         * Get folder name from folder ID
+         * @param {string} folderId - Folder UUID
+         * @returns {string|null} - Folder name
+         */
+        function getFolderName(folderId) {
+            if (!folderId) return '';
+            const folder = folders.find(f => f.id === folderId);
+            return folder ? folder.name : '';
+        }
+
+        /**
+         * Get type name from type number
+         * @param {number} type - Type code
+         * @returns {string} - Type name
+         */
+        function getTypeName(type) {
+            const types = {
+                1: 'Login',
+                2: 'Secure Note',
+                3: 'Card',
+                4: 'Identity'
+            };
+            return types[type] || 'Unknown';
+        }
+
+        /**
+         * Format date for display
+         * @param {string} dateStr - ISO date string
+         * @returns {string} - Formatted date
+         */
+        function formatDate(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        /**
+         * Escape HTML to prevent XSS
+         * @param {string} text - Raw text
+         * @returns {string} - Escaped text
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+/**
+ * Uncheck all items in all clusters
+ */
+function deselectAll() {
+    itemsToDelete.clear();
+    renderClusters();
+    updateStats();
+}
+
+/**
+ * Reset selections to the initial automatic recommendations
+ */
+function selectRecommended() {
+    itemsToDelete.clear();
+    duplicateClusters.forEach(cluster => {
+        rankAndSuggest(cluster);
+    });
+    renderClusters();
+    updateStats();
+}
+
+        /**
+         * Toggle item deletion status
+         * @param {string} itemId - Item UUID
+         */
+        function toggleItemDeletion(itemId) {
+            setItemMarkedState(itemId, !itemsToDelete.has(itemId));
+            updateStats();
+        }
+
+        /**
+         * Keep newest item in cluster, mark others for deletion
+         * @param {number} clusterIndex - Cluster index
+         */
+        function keepNewestInCluster(clusterIndex) {
+            const cluster = duplicateClusters[clusterIndex];
+            
+            // Find newest item by revisionDate
+            let newestItem = cluster.items[0];
+            cluster.items.forEach(item => {
+                if (item.revisionDate > newestItem.revisionDate) {
+                    newestItem = item;
+                }
+            });
+
+            // Mark all others for deletion
+            cluster.items.forEach(item => {
+                if (item.id !== newestItem.id) {
+                    setItemMarkedState(item.id, true);
+                } else {
+                    setItemMarkedState(item.id, false);
+                }
+            });
+
+            updateStats();
+        }
+
+        /**
+         * Select all items in cluster for deletion
+         * @param {number} clusterIndex - Cluster index
+         */
+        function selectAllInCluster(clusterIndex) {
+            const cluster = duplicateClusters[clusterIndex];
+            
+            cluster.items.forEach(item => {
+                setItemMarkedState(item.id, true);
+            });
+
+            updateStats();
+        }
+
+        /**
+         * Update statistics display
+         */
+        function updateStats() {
+            document.getElementById('totalItems').textContent = items.length;
+            document.getElementById('duplicateClusters').textContent = duplicateClusters.length;
+            document.getElementById('markedForDeletion').textContent = itemsToDelete.size;
+            document.getElementById('mergeCandidates').textContent = duplicateClusters.filter(cluster => cluster.mergeCandidate && !cluster.hasConflict).length;
+            
+            // Manage section visibility
+            document.getElementById('exportGuide').classList.add('hidden');
+            document.getElementById('gettingStarted').classList.add('hidden');
+            document.getElementById('resultsSection').classList.add('show');
+            
+            if (duplicateClusters.length === 0) {
+                document.getElementById('noDuplicatesMsg').classList.remove('hidden');
+                document.getElementById('clustersContainer').classList.add('hidden');
+            } else {
+                document.getElementById('noDuplicatesMsg').classList.add('hidden');
+                document.getElementById('clustersContainer').classList.remove('hidden');
+            }
+
+            // Enable export and CLI script buttons if items are marked for deletion or merged
+            const exportBtn = document.getElementById('exportBtn');
+            const cliScriptBtn = document.getElementById('cliScriptBtn');
+            const hasMerges = originalData.items.some(i => i.isNexoMerge);
+            const hasChanges = itemsToDelete.size > 0 || hasMerges;
+            
+            exportBtn.disabled = !hasChanges;
+            cliScriptBtn.disabled = !hasChanges;
+        }
+
+        /**
+         * Bring the user to the top of the results after a vault is analyzed.
+         * This keeps the first cluster in view instead of leaving the viewport near the bottom.
+         */
+        function scrollToResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            if (!resultsSection) return;
+
+            requestAnimationFrame(() => {
+                resultsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        }
+
+        /**
+         * Export cleaned JSON data
+         */
+        function exportCleanedData() {
+            if (itemsToDelete.size === 0) {
+                alert('⚠️ No items marked for deletion. Please select items to remove.');
+                return;
+            }
+
+            if (!confirm(`You are about to export a cleaned vault with ${itemsToDelete.size} item(s) removed.\n\nContinue?`)) {
+                return;
+            }
+
+            try {
+                // Preserve the original vault structure. The cleaned export should only remove the
+                // selected items and keep any synthesized [ MERGED ] records already added in-memory.
+                const now = new Date();
+                const timestamp = now.toISOString().replace(/[-:]/g, '').split('.')[0];
+                const cleanedItems = originalData.items
+                    .filter(item => !itemsToDelete.has(item.id))
+                    .map(item => {
+                        const cleanItem = JSON.parse(JSON.stringify(item));
+                        delete cleanItem.isNexoMerge;
+                        return cleanItem;
+                    });
+
+                const cleanedData = {
+                    ...originalData,
+                    folders: [...(originalData.folders || [])],
+                    items: cleanedItems
+                };
+
+                // Generate filename with timestamp
+                const filename = `nexo_cleaned_${timestamp}.json`;
+
+                // Create and download file
+                const blob = new Blob([JSON.stringify(cleanedData, null, 2)], { 
+                    type: 'application/json' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                alert(`✓ Export successful!\n\n` +
+                      `File: ${filename}\n` +
+                      `Removed: ${itemsToDelete.size} item(s)\n` +
+                      `Remaining: ${cleanedData.items.length} item(s)\n\n` +
+                      `IMPORT INSTRUCTIONS:\n` +
+                      `1. Open Bitwarden (Web Vault or Desktop App)\n` +
+                      `2. Go to Tools → Import Data\n` +
+                      `3. Select format: "Bitwarden (json)"\n` +
+                      `4. Choose the downloaded file: ${filename}\n` +
+                      `5. Click Import\n\n` +
+                      `The existing folder structure is preserved in the export.\n` +
+                      `Review the import carefully before replacing your main vault.`);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Error exporting data: ' + error.message);
+            }
+        }
+
+        /**
+         * Generate a UUID v4
+         */
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                return crypto.randomUUID();
+            }
+
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        /**
+         * Show CLI scripts modal
+         */
+        function showCLIScripts() {
+            if (itemsToDelete.size === 0 && !originalData.items.some(i => i.isNexoMerge)) {
+                alert('⚠️ No changes detected (deletions or merges).');
+                return;
+            }
+
+            // 1. Get items to delete
+            const itemsArray = Array.from(itemsToDelete).map(id => {
+                const item = items.find(i => i.id === id);
+                return {
+                    id: item.id,
+                    name: item.name || 'Untitled'
+                };
+            });
+
+            // 2. Get items to create (Merges)
+            const mergesArray = originalData.items
+                .filter(i => i.isNexoMerge)
+                .map(item => {
+                    // Create a clean copy without Nexo metadata for the CLI
+                    const cleanItem = JSON.parse(JSON.stringify(item));
+                    delete cleanItem.isNexoMerge;
+                    delete cleanItem.id; // BW CLI will assign a new ID on creation
+                    return {
+                        name: item.name,
+                        json: JSON.stringify(cleanItem)
+                    };
+                });
+
+            // Generate Bash script
+            let bashScript = `#!/bin/bash\n\n`;
+            bashScript += `# Nexo CLI Automation Script\n`;
+            bashScript += `# Generated: ${new Date().toISOString()}\n`;
+            bashScript += `# Items to delete: ${itemsArray.length}\n`;
+            bashScript += `# Merged records to create: ${mergesArray.length}\n\n`;
+            bashScript += `# Make sure you're logged in and have BW_SESSION set:\n`;
+            bashScript += `# export BW_SESSION="$(bw unlock --raw)"\n\n`;
+            
+            if (mergesArray.length > 0) {
+                bashScript += `echo "Creating ${mergesArray.length} merged records..."\n`;
+                mergesArray.forEach((merge, index) => {
+                    bashScript += `# Merge ${index + 1}: ${merge.name}\n`;
+                    // Use a here-doc or quoted string for the JSON
+                    bashScript += `echo '${merge.json.replace(/'/g, "'\\''")}' | bw create item\n`;
+                });
+                bashScript += `\n`;
+            }
+
+            if (itemsArray.length > 0) {
+                bashScript += `echo "Deleting ${itemsArray.length} items from Bitwarden vault..."\n`;
+                itemsArray.forEach((item, index) => {
+                    bashScript += `# Deletion ${index + 1}: ${item.name}\n`;
+                    bashScript += `bw delete item ${item.id}\n`;
+                });
+            }
+            
+            bashScript += `\necho "✓ Cleanup complete!"\n`;
+            bashScript += `bw sync\n`;
+
+            // Generate PowerShell script
+            let psScript = `# Nexo CLI Automation Script\n`;
+            psScript += `# Generated: ${new Date().toISOString()}\n`;
+            psScript += `# Items to delete: ${itemsArray.length}\n`;
+            psScript += `# Merged records to create: ${mergesArray.length}\n\n`;
+            psScript += `# Make sure you're logged in and have BW_SESSION set:\n`;
+            psScript += `# $env:BW_SESSION = bw unlock --raw\n\n`;
+            
+            if (mergesArray.length > 0) {
+                psScript += `Write-Host "Creating ${mergesArray.length} merged records..."\n`;
+                mergesArray.forEach((merge, index) => {
+                    psScript += `# Merge ${index + 1}: ${merge.name}\n`;
+                    // PowerShell string escaping for JSON is tricky; using @'' here-string approach
+                    const escapedJson = merge.json.replace(/'/g, "''");
+                    psScript += `@'\n${merge.json}\n'@ | bw create item\n`;
+                });
+                psScript += `\n`;
+            }
+
+            if (itemsArray.length > 0) {
+                psScript += `Write-Host "Deleting ${itemsArray.length} items from Bitwarden vault..."\n`;
+                itemsArray.forEach((item, index) => {
+                    psScript += `# Deletion ${index + 1}: ${item.name}\n`;
+                    psScript += `bw delete item ${item.id}\n`;
+                });
+            }
+            
+            psScript += `\nWrite-Host "✓ Cleanup complete!"\n`;
+            psScript += `bw sync\n`;
+
+            // Set script content
+            document.getElementById('bashScriptText').value = bashScript;
+            document.getElementById('powershellScriptText').value = psScript;
+
+            // Show modal
+            document.getElementById('cliScriptModal').classList.add('show');
+        }
+
+        /**
+         * Close CLI scripts modal
+         */
+        function closeCLIModal() {
+            document.getElementById('cliScriptModal').classList.remove('show');
+        }
+
+        /**
+         * Switch between script tabs
+         */
+        function switchScriptTab(tab) {
+            // Update tabs
+            document.querySelectorAll('#cliScriptModal .script-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`#cliScriptModal .script-tab[onclick*="${tab}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('#cliScriptModal .script-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab === 'bash' ? 'bashScript' : 'powershellScript').classList.add('active');
+        }
+
+        /**
+         * Switch between export instruction tabs
+         */
+        function switchExportTab(tab) {
+            // Update tabs
+            document.querySelectorAll('#exportTabs .script-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`#exportTabs .script-tab[onclick*="${tab}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.export-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`export-${tab}`).classList.remove('hidden');
+        }
+
+        /**
+         * Copy script to clipboard
+         */
+        async function copyScript(type) {
+            const textarea = document.getElementById(type === 'bash' ? 'bashScriptText' : 'powershellScriptText');
+            try {
+                await copyTextToClipboard(textarea.value);
+            } catch (error) {
+                console.error('Failed to copy script:', error);
+                alert('❌ Unable to copy the script automatically. Please copy it manually.');
+                return;
+            }
+
+            // Update button
+            const btn = textarea.parentElement.querySelector('.copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            btn.classList.add('copied');
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+
+        /**
+         * Clear all data and reset application
+         */
+        function clearAllData() {
+            if (!confirm('Clear all loaded data and start over?')) {
+                return;
+            }
+
+            originalData = null;
+            resetAnalysisState();
+
+            // Reset UI
+            document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('exportGuide').classList.remove('hidden');
+            document.getElementById('gettingStarted').classList.remove('hidden');
+            document.getElementById('fileInput').value = '';
+            closeMergeModal();
+            closeCLIModal();
+            
+            // Clear containers
+            document.getElementById('clustersContainer').innerHTML = '';
+            document.getElementById('noDuplicatesMsg').classList.add('hidden');
+
+            alert('✓ Data cleared. You can now upload a new file.');
+        }
+
+        /**
+         * Show/hide loading overlay
+         * @param {boolean} show - Show or hide
+         */
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        /**
+         * Toggle between light and dark theme
+         */
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        /**
+         * Initialize theme from localStorage or default to light mode
+         */
+        function initTheme() {
+            const savedTheme = getStoredTheme() || 'light';
+            applyTheme(savedTheme);
+        }
+
+        function getStoredTheme() {
+            try {
+                return localStorage.getItem(THEME_STORAGE_KEY);
+            } catch (error) {
+                console.warn('Theme preference could not be read from localStorage:', error);
+                return null;
+            }
+        }
+
+        function storeTheme(theme) {
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, theme);
+            } catch (error) {
+                console.warn('Theme preference could not be written to localStorage:', error);
+            }
+        }
+
+        /**
+         * Apply the selected theme to both the document root and the toggle icons.
+         * Centralizing this avoids subtle drift between initTheme() and toggleTheme().
+         * @param {'light'|'dark'} theme - Theme to apply
+         */
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
+            root.setAttribute('data-theme', resolvedTheme);
+            
+            // Toggle visibility of icons
+            const lightIcon = document.querySelector('.theme-icon-light');
+            const darkIcon = document.querySelector('.theme-icon-dark');
+            
+            if (lightIcon) lightIcon.style.display = resolvedTheme === 'dark' ? 'none' : 'block';
+            if (darkIcon) darkIcon.style.display = resolvedTheme === 'dark' ? 'block' : 'none';
+            
+            storeTheme(resolvedTheme);
+        }
+
+        /**
+         * Toggle password visibility for a specific item
+         * @param {string} itemId - Item UUID
+         */
+        function togglePasswordVisibility(itemId) {
+            const pwdElement = document.getElementById(`pwd-${itemId}`);
+            if (!pwdElement) return;
+            
+            const isMasked = pwdElement.getAttribute('data-masked') === 'true';
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (isMasked) {
+                // Show full password
+                pwdElement.textContent = item.password;
+                pwdElement.setAttribute('data-masked', 'false');
+            } else {
+                // Show masked password
+                pwdElement.textContent = item.maskedPassword;
+                pwdElement.setAttribute('data-masked', 'true');
+            }
+        }
+    </script>
+</body>
+</html>
