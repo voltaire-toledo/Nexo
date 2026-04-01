@@ -58,11 +58,5 @@ Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an independent p
 
 ---
 
-### Shortcuts
-- <kbd>Ctrl/Cmd</kbd> + <kbd>O</kbd>: Open Vault File
-- <kbd>Ctrl/Cmd</kbd> + <kbd>S</kbd>: Export Cleaned JSON
-- <kbd>Esc</kbd>: Close Modals
-
----
 
 Made for Bitwarden power users who want local-first cleanup.
