@@ -2,11 +2,12 @@
 .agents/
 .gemini/
 .github/skills/
-skills-lock.json
+.playground/
 
 # OS/editor noise
 .DS_Store
 Thumbs.db
+*.json
 
 # Local environment files
 .env
