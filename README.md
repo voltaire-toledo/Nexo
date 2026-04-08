@@ -1,4 +1,15 @@
-# Nexo
+<p align="center">
+  <img src="assets/nexo-logo.svg" alt="Nexo" width="96" height="96" />
+</p>
+
+<h1 align="center">Nexo</h1>
+<p align="center">Find duplicates. Merge what matters. Bring order to your Bitwarden Vault. </p>
+
+<p align="center">
+  <img src="assets/home-split.png" alt="Dark and Light Mode support" width="600" />
+</p>
+
+<p align="center"><sub>Demo prepared with <a href="https://tight.studio/">Tight Studio</a></sub></p>
 
 A secure, offline-first utility for analyzing duplicate entries in Bitwarden vault exports.
 
@@ -6,7 +17,7 @@ A secure, offline-first utility for analyzing duplicate entries in Bitwarden vau
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Security](https://img.shields.io/badge/security-offline--only-brightgreen)
 
-Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.
+
 
 ## 🔒 Security & Privacy Guarantees
 
