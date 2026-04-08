@@ -11,43 +11,52 @@
 
 <p align="center"><sub>Demo prepared with <a href="https://tight.studio/">Tight Studio</a></sub></p>
 
+> Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.
+
 A secure, offline-first utility for analyzing duplicate entries in Bitwarden vault exports.
 
-![Version](https://img.shields.io/badge/version-1.2-teal)
+![Version](https://img.shields.io/badge/version-0.1-teal)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Security](https://img.shields.io/badge/security-offline--only-brightgreen)
 
-
-
-## 🔒 Security & Privacy Guarantees
+## 🔒 Security & Privacy
 
 - **100% Offline**: Works completely offline in airgapped environments.
 - **Zero External Dependencies**: Single HTML file with zero remote calls (no CDNs, no fonts).
 - **Weighted Duplicate Intelligence**: Matching logic that distinguishes stubs from complete records.
-- **Burned Teal UI**: High-density, professional interface designed for 10,000+ records.
 
-## ✨ Key Features
+## Features
 
-### 🧬 Review & Merge (Record Synthesis)
-Identify items with identical credentials but unique data (TOTP, Notes, Custom Fields). Synthesize them into a single **Union Record** and automatically move originals to the Trash.
+### 🧬 Review & Merge
+Identify items with identical credentials but unique data (TOTP, FIDO2 Passkeys, Notes, Custom Fields). Merge them into a **union record** and automatically move originals to the Trash.
 
-### 🔍 Differential Highlighting (≠)
+### ≠ Differential Highlighting
 Instantly see exactly where records differ. Divergent fields are highlighted with **wavy underlines** and bolding, accompanied by the divergence (≠) icon.
 
 ### ⚠️ Conflict & SSO Protection
 Prevents accidental data loss by flagging password mismatches as "Conflicts" and preventing auto-selection on SSO-tagged accounts.
 
-## 🚀 Recommended Workflows
+## Use Cases & Workflows
 
-### 1. Surgical Cleaning (Safe & Recoverable)
+### 1. Selective Cleaning (Safe & Recoverable)
 The most robust way to clean your vault:
-1. **Analyze**: Upload your unencrypted JSON to identify duplicates.
-2. **Review & Merge**: Synthesize complementary records into the `[ MERGED ]` folder.
-3. **CLI Delete**: Use **"Get CLI Deletion Script"** to move items to your **Vault Trash**.
-4. **Safety**: Items in Trash can be recovered within 30 days if needed.
+1. **Analyze**: Upload your exported Bitwarden Vault (JSON) to identify duplicates.
+2. **Review & Merge**: The utility will use its built-in weight system to auto-recommend duplicate records marked for deletion or synthesize complementary records into a `MERGED` folder for your Vault.
+3. **CLI Delete**: Use **"Get CLI Deletion Script"** and Nexo will generate a script for you to edit/download. The script will come in two flavors: PowerShell (Windows) and Bash (macOS, Linux).
+4. **Safety**: Run the script and only the ones you selected to be deleted or merged will be processed. Deleted items will be stored in your Vault's Trash (up to 30 days)for easy retrieval.
 
 ### 2. Seamless Migration (Cross-Manager)
-Use the **"Download JSON"** export if migrating to a **new/empty vault** or a different manager like 1Password or Proton Pass.
+Use the **"Download JSON"** export if migrating to a **new/empty vault** or a different password manager that can import your passwords from Bitwarden, like 1Password or Proton Pass
+
+### 3. Expert Mode: Import the Cleaned JSON back into your Vault
+This will get your Vault back into a much cleaner state sooner, and it was always part of the original design. 
+
+> [!CAUTION]
+> When importing a new JSON, with all your unique and merged records, into your Bitwarden vault, it is highly recommended to: 
+> - Delete all the records currently in your Vault so they end up in the Trash directory, or…
+> - Import them into a new and empty directory.
+>
+> Not doing so will only guarantee duplicate records to be introduced back into your Vault. Bitwarden will not replace the records.
 
 ## ⚠️ Disclaimer & Liability Warning
 
@@ -59,11 +68,5 @@ Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an independent p
 
 ---
 
-### Shortcuts
-- <kbd>Ctrl/Cmd</kbd> + <kbd>O</kbd>: Open Vault File
-- <kbd>Ctrl/Cmd</kbd> + <kbd>S</kbd>: Export Cleaned JSON
-- <kbd>Esc</kbd>: Close Modals
-
----
 
 Made for Bitwarden power users who want local-first cleanup.
