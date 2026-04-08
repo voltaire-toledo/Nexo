@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;">
     <title>Nexo - Duplicate Cleanup for Bitwarden Vaults</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512' fill='none'%3E%3Crect width='512' height='512' rx='112' fill='%231E3D46'/%3E%3Cpath d='M122 376V136' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M122 136L390 376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M390 136V376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='255' cy='256' r='34' fill='%23C9822B'/%3E%3C/svg%3E">
-    
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512' fill='none'%3E%3Crect width='512' height='512' rx='112' fill='%231E3D46'/%3E%3Cpath d='M122 376V136' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M122 136L390 376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M390 136V376' stroke='%23F3EFE4' stroke-width='52' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='255' cy='256' r='34' fill='%23C9822B'/%3E%3C/svg%3E">
+
     <style>
         /* ===== CSS VARIABLES ===== */
         :root {
@@ -15,25 +18,26 @@
             --teal-deep: #0F6670;
             --teal-mid: #0A8E84;
             --teal-light: #B1CEDE;
-            --accent: #CB7F29; /* Ochre Spark */
+            --accent: #CB7F29;
+            /* Ochre Spark */
             --accent-hover: #a6651f;
             --accent-subtle: #f9ead2;
-            
+
             --success: #0A8E84;
             --danger: #dc2626;
             --warning: #CB7F29;
-            
+
             /* Burned Base (Off-White/Cream) */
             --bg-page: #F1F1E6;
             --bg-surface: #ffffff;
             --bg-muted: #e8e8d9;
             --bg-subtle: #dbdbc7;
-            
+
             --fg-base: #233F4C;
             --fg-muted: #3d5a68;
             --fg-subtle: #5a7684;
             --fg-ghost: #8aa1ae;
-            
+
             --border: #dbdbc7;
             --border-subtle: #e8e8d9;
 
@@ -47,20 +51,20 @@
             --text-tertiary: var(--fg-subtle);
             --text-muted: var(--fg-muted);
             --warning-color: var(--warning);
-            
+
             /* Elevation & Rhythm */
             --shadow-sm: 0 1px 2px rgba(35, 63, 76, 0.08);
             --shadow-md: 0 4px 6px -1px rgba(35, 63, 76, 0.12), 0 2px 4px -1px rgba(35, 63, 76, 0.06);
-            
+
             --radius-sm: 4px;
             --radius-md: 6px;
             --radius-lg: 12px;
-            
+
             /* Advanced System Stacks */
             --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-serif: ui-serif, Georgia, "Times New Roman", serif;
             --font-mono: ui-monospace, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            
+
             --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -70,17 +74,17 @@
             --bg-surface: #233F4C;
             --bg-muted: #2d4d5a;
             --bg-subtle: #3a5f6d;
-            
+
             --fg-base: #F1F1E6;
             --fg-muted: #B1CEDE;
             --fg-subtle: #8aa1ae;
             --fg-ghost: #5a7684;
-            
+
             --border: #2d4d5a;
             --border-subtle: #3a5f6d;
-            
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -89,12 +93,12 @@
                 --bg-surface: #233F4C;
                 --bg-muted: #2d4d5a;
                 --bg-subtle: #3a5f6d;
-                
+
                 --fg-base: #F1F1E6;
                 --fg-muted: #B1CEDE;
                 --fg-subtle: #8aa1ae;
                 --fg-ghost: #5a7684;
-                
+
                 --border: #2d4d5a;
                 --border-subtle: #3a5f6d;
             }
@@ -127,11 +131,21 @@
             margin: 0 auto;
         }
 
+        .hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+        }
+
         .top-actions {
+            grid-column: 3;
             display: flex;
             justify-content: flex-end;
+            justify-self: end;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            flex-shrink: 0;
         }
 
         .theme-toggle {
@@ -150,14 +164,14 @@
             box-shadow: var(--shadow-sm);
             text-decoration: none;
         }
-        
+
         .theme-toggle:hover {
             background: var(--bg-hover);
             border-color: var(--accent-primary);
             color: var(--accent-primary);
             box-shadow: var(--shadow-md);
         }
-        
+
         .theme-toggle svg {
             width: 18px;
             height: 18px;
@@ -170,17 +184,26 @@
 
         /* ===== PAGE TITLE ===== */
         .page-title {
-            margin-bottom: clamp(2.25rem, 5vw, 3.25rem);
+            flex: 1;
             max-width: 46rem;
         }
 
         .page-title h1 {
             color: var(--fg-base);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
             font-size: clamp(1.875rem, 4vw, 2.5rem);
             font-weight: 700;
             letter-spacing: -0.035em;
             margin-bottom: 0.5rem;
             line-height: 1.15;
+        }
+
+        .page-title-logo {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
         }
 
         .page-title p {
@@ -193,56 +216,31 @@
 
         /* ===== PRIVACY BANNER ===== */
         .privacy-banner {
-            background: var(--success);
+            background: #0F6670;
             color: white;
-            padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 3vw, 1.75rem);
+            padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2.5vw, 1.25rem);
             border-radius: var(--radius-md);
             margin-bottom: 1rem;
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
+            gap: 0.75rem;
             box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.875rem;
+            line-height: 1.45;
         }
 
         .privacy-banner svg {
             flex-shrink: 0;
             margin-top: 0.125rem;
         }
-        
+
         .privacy-banner-content {
             flex: 1;
         }
-        
+
         .privacy-banner strong {
             font-weight: 600;
-        }
-
-        /* ===== EXTENSION WARNING ===== */
-        .extension-warning {
-            background: var(--warning);
-            color: white;
-            padding: 16px 24px;
-            border-radius: var(--radius-md);
-            margin-bottom: 24px;
-            display: none;
-            box-shadow: var(--shadow-md);
-        }
-
-        .extension-warning.show {
-            display: block;
-        }
-
-        .extension-warning h3 {
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-        }
-
-        .extension-warning ul {
-            margin: 12px 0 12px 24px;
         }
 
         /* ===== UPLOAD ZONE ===== */
@@ -300,7 +298,8 @@
         .upload-zone:hover,
         .upload-zone.dragover {
             border-color: var(--anchor);
-            background: #84a2a1; /* Slightly deeper version of #95B1B0 */
+            background: #84a2a1;
+            /* Slightly deeper version of #95B1B0 */
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
@@ -476,7 +475,27 @@
 
         .status-actions {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .status-actions .btn {
+            padding: 0.35rem 0.625rem;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            min-height: 2rem;
+        }
+
+        .status-actions .btn svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .status-actions .btn-label {
+            line-height: 1;
+            white-space: nowrap;
         }
 
         /* ===== RESULTS SECTION ===== */
@@ -549,6 +568,9 @@
         }
 
         .match-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
             font-size: 0.65rem;
             padding: 0.25rem 0.625rem;
             border-radius: var(--radius-sm);
@@ -558,6 +580,11 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             border: 1px solid var(--border);
+        }
+
+        .tag-identity {
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         .tag-conflict {
@@ -570,6 +597,39 @@
             background: #f0fdfa;
             color: var(--teal-deep);
             border-color: #ccfbf1;
+        }
+
+        .tag-identity {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .tag-difference {
+            background: #fff7ed;
+            color: #9a3412;
+            border-color: #fed7aa;
+        }
+
+        .tag-score {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        .match-tag-icon {
+            display: inline-flex;
+            width: 0.9rem;
+            height: 0.9rem;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .match-tag-icon svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .divergence-icon {
@@ -680,6 +740,10 @@
             height: 15px;
             color: var(--danger);
             flex-shrink: 0;
+        }
+
+        :root[data-theme="dark"] .item-delete-control svg {
+            color: #fca5a5;
         }
 
         .item-details {
@@ -823,8 +887,9 @@
         }
 
         /* High-Visibility Focus States */
-        button:focus-visible, 
-        input:focus-visible, 
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
         .upload-zone:focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 4px;
@@ -873,7 +938,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ===== INSTRUCTIONS PANEL ===== */
@@ -895,7 +962,7 @@
             border-radius: var(--radius-lg);
             padding: 1.5rem;
             margin-top: 0;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             box-shadow: var(--shadow-sm);
         }
 
@@ -1002,9 +1069,10 @@
             border: 1px solid rgba(35, 63, 76, 0.18);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
         }
+
         .instructions h3 {
             margin-top: 0;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             color: var(--text-primary);
             font-size: 1rem;
             font-weight: 600;
@@ -1033,13 +1101,6 @@
             margin-bottom: 0.5rem;
         }
 
-        .shortcuts-text {
-            margin-top: 0;
-            margin-bottom: 0;
-            padding-top: 0;
-            font-size: 0.8rem;
-        }
-        
         .instructions li:last-child {
             margin-bottom: 0;
         }
@@ -1049,7 +1110,7 @@
             background-color: var(--bg-muted);
             border: 1px solid var(--border);
             border-radius: 3px;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
             color: var(--fg-base);
             display: inline-block;
             font-family: var(--font-mono);
@@ -1061,8 +1122,8 @@
 
         /* ===== FOOTER BAND ===== */
         .footer-disclaimer {
-            margin-top: 4.5rem;
-            padding: 2.25rem 0 0;
+            margin-bottom: 2rem;
+            padding: 1rem 0 0;
             border-top: 1px solid var(--border);
             text-align: center;
         }
@@ -1071,22 +1132,22 @@
             font-size: 0.74rem;
             color: var(--fg-ghost);
             line-height: 1.65;
-            max-width: 44rem;
+            max-width: 64rem;
             margin: 0 auto;
         }
 
-        .footer-disclaimer p + p {
+        .footer-disclaimer p+p {
             margin-top: 0.75rem;
         }
 
         .footer-disclaimer strong {
             color: var(--fg-subtle);
         }
-        
+
         .instructions p {
             color: var(--text-secondary);
             line-height: 1.4;
-            font-size: clamp(0.6875rem, 1.1vw, 0.75rem);
+            font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
         }
 
         /* ===== CLI SCRIPT MODAL ===== */
@@ -1151,6 +1212,47 @@
 
         .modal-body {
             padding: 1.5rem;
+        }
+
+        .merge-preview-card {
+            border-color: var(--teal-mid);
+            background: var(--bg-muted);
+        }
+
+        .merge-edit-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .merge-edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .merge-edit-input,
+        .merge-edit-textarea {
+            width: 100%;
+            background: var(--bg-surface);
+            color: var(--fg-base);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.7rem 0.8rem;
+            font: inherit;
+        }
+
+        .merge-edit-textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.45;
+        }
+
+        .merge-field-hint {
+            color: var(--fg-ghost);
+            font-size: 0.75rem;
+            line-height: 1.4;
         }
 
         .script-tabs {
@@ -1278,6 +1380,15 @@
                 padding: 12px;
             }
 
+            .hero-header {
+                gap: 0.75rem;
+                margin-bottom: 0.875rem;
+            }
+
+            .top-actions {
+                margin-left: auto;
+            }
+
             .header h1 {
                 font-size: 22px;
             }
@@ -1310,55 +1421,80 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="top-actions">
-            <a href="https://github.com/voltaire-toledo/Nexo" target="_blank" rel="noopener noreferrer" class="theme-toggle" id="githubBtn" title="View on GitHub">
-                <svg width="26" height="26" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M56.7937 84.9688C44.4187 83.4688 35.7 74.5625 35.7 63.0313C35.7 58.3438 37.3875 53.2813 40.2 49.9063C38.9812 46.8125 39.1687 40.25 40.575 37.5313C44.325 37.0625 49.3875 39.0313 52.3875 41.75C55.95 40.625 59.7 40.0625 64.2937 40.0625C68.8875 40.0625 72.6375 40.625 76.0125 41.6563C78.9187 39.0313 84.075 37.0625 87.825 37.5313C89.1375 40.0625 89.325 46.625 88.1062 49.8125C91.1062 53.375 92.7 58.1563 92.7 63.0313C92.7 74.5625 83.9812 83.2813 71.4187 84.875C74.6062 86.9375 76.7625 91.4375 76.7625 96.5938L76.7625 106.344C76.7625 109.156 79.1062 110.75 81.9187 109.625C98.8875 103.156 112.2 86.1875 112.2 65.1875C112.2 38.6563 90.6375 17 64.1062 17C37.575 17 16.2 38.6562 16.2 65.1875C16.2 86 29.4187 103.25 47.2312 109.719C49.7625 110.656 52.2 108.969 52.2 106.438L52.2 98.9375C50.8875 99.5 49.2 99.875 47.7 99.875C41.5125 99.875 37.8562 96.5 35.2312 90.2188C34.2 87.6875 33.075 86.1875 30.9187 85.9063C29.7937 85.8125 29.4187 85.3438 29.4187 84.7813C29.4187 83.6563 31.2937 82.8125 33.1687 82.8125C35.8875 82.8125 38.2312 84.5 40.6687 87.9688C42.5437 90.6875 44.5125 91.9063 46.8562 91.9063C49.2 91.9063 50.7 91.0625 52.8562 88.9063C54.45 87.3125 55.6687 85.9063 56.7937 84.9688Z" fill="currentColor"/>
-                </svg>
-            </a>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
-                <svg class="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
-                    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <svg class="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
+        <div class="hero-header">
+            <!-- Page Title -->
+            <div class="page-title">
+                <h1>
+                    <svg class="page-title-logo" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <rect width="512" height="512" rx="112" fill="#1E3D46" />
+                        <path d="M122 376V136" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M122 136L390 376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M390 136V376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <circle cx="255" cy="256" r="34" fill="#C9822B" />
+                    </svg>
+                    <span>Nexo</span>
+                </h1>
+                <p>Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.</p>
+            </div>
 
-        <!-- Page Title -->
-        <div class="page-title">
-            <h1>
-                <svg width="42" height="42" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: -0.45rem; margin-right: 0.75rem;">
-                    <rect width="512" height="512" rx="112" fill="#1E3D46"/>
-                    <path d="M122 376V136" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M122 136L390 376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M390 136V376" stroke="#F3EFE4" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="255" cy="256" r="34" fill="#C9822B"/>
-                </svg>
-                Nexo
-            </h1>
-            <p>Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.</p>
+            <div class="top-actions">
+                <a href="https://github.com/voltaire-toledo/Nexo" target="_blank" rel="noopener noreferrer"
+                    class="theme-toggle" id="githubBtn" title="View on GitHub">
+                    <svg width="26" height="26" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M56.7937 84.9688C44.4187 83.4688 35.7 74.5625 35.7 63.0313C35.7 58.3438 37.3875 53.2813 40.2 49.9063C38.9812 46.8125 39.1687 40.25 40.575 37.5313C44.325 37.0625 49.3875 39.0313 52.3875 41.75C55.95 40.625 59.7 40.0625 64.2937 40.0625C68.8875 40.0625 72.6375 40.625 76.0125 41.6563C78.9187 39.0313 84.075 37.0625 87.825 37.5313C89.1375 40.0625 89.325 46.625 88.1062 49.8125C91.1062 53.375 92.7 58.1563 92.7 63.0313C92.7 74.5625 83.9812 83.2813 71.4187 84.875C74.6062 86.9375 76.7625 91.4375 76.7625 96.5938L76.7625 106.344C76.7625 109.156 79.1062 110.75 81.9187 109.625C98.8875 103.156 112.2 86.1875 112.2 65.1875C112.2 38.6563 90.6375 17 64.1062 17C37.575 17 16.2 38.6562 16.2 65.1875C16.2 86 29.4187 103.25 47.2312 109.719C49.7625 110.656 52.2 108.969 52.2 106.438L52.2 98.9375C50.8875 99.5 49.2 99.875 47.7 99.875C41.5125 99.875 37.8562 96.5 35.2312 90.2188C34.2 87.6875 33.075 86.1875 30.9187 85.9063C29.7937 85.8125 29.4187 85.3438 29.4187 84.7813C29.4187 83.6563 31.2937 82.8125 33.1687 82.8125C35.8875 82.8125 38.2312 84.5 40.6687 87.9688C42.5437 90.6875 44.5125 91.9063 46.8562 91.9063C49.2 91.9063 50.7 91.0625 52.8562 88.9063C54.45 87.3125 55.6687 85.9063 56.7937 84.9688Z"
+                            fill="currentColor" />
+                    </svg>
+                </a>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch to Dark Mode"
+                    aria-label="Switch to Dark Mode">
+                    <svg class="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" />
+                        <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg class="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Privacy Banner -->
         <div class="privacy-banner">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="white"/>
-                <path d="M10 17l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#059669"/>
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="white" />
+                <path d="M10 17l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#059669" />
             </svg>
             <div class="privacy-banner-content">
-                <strong>100% Private & Secure:</strong> All processing happens in your browser. No data is transmitted over the network. This tool works completely offline.
+                <strong>Open source code. 100% local processing.</strong><br>
+                Nexo is built for full transparency - your vault data never leaves this device. However, third-party
+                browser extensions can still observe your screen. For true privacy, run this tool in a clean,
+                extension-free Private/Incognito window.
             </div>
         </div>
 
@@ -1366,41 +1502,51 @@
         <div class="getting-started" id="gettingStarted">
             <!-- Instructions -->
             <div class="instructions">
-                <h3>Recommended Workflow (Surgical & Safe)</h3>
+                <h3>Ready to clean up?</h3>
                 <ol>
-                    <li>Upload your <strong>unencrypted JSON</strong> vault export to identify duplicates.</li>
-                    <li>Select the items you wish to remove.</li>
+                    <li>Follow the instructions in <strong>Step 1</strong> to export your Bitwarden vault to a
+                        <strong>JSON file</strong> and drag upload it into the page.
+                    </li>
+                    <li>Select the items you wish to remove or merge.</li>
                     <li>Click <strong>"Get CLI Deletion Script"</strong> and run the generated commands.</li>
-                    <li><strong>Why?</strong> This surgically moves items to your <strong>Vault Trash</strong>. Your original records (TOTP, Passkeys, etc.) remain recoverable if needed.</li>
                 </ol>
 
-                <h3 style="margin-top: 1.5rem; opacity: 0.8;">Alternative: JSON Export (For Migrations)</h3>
-                <p style="font-size: 0.75rem; color: var(--fg-muted); margin-bottom: 0.5rem;">
-                    Use this only if importing to a <strong>new/empty vault</strong> or a different password manager (e.g., 1Password, Proton Pass).
+                <p style="color: var(--fg-muted); margin-bottom: 0.5rem;">
+                    You may also choose to export a "cleaned" JSON file and re-import it to your vault instead of the
+                    CLI approach above, but this is only recommended for certain use cases, e.g. backup, importing to a
+                    <strong>new/empty vault</strong> or migrating to a different password manager (e.g., 1Password,
+                    Proton Pass).
                 </p>
                 <div class="warning-box-tight">
-                    <p style="color: var(--warning); font-weight: 600; font-size: 0.75rem; margin-bottom: 0.25rem;">⚠️ Warning:</p>
-                    <p style="color: var(--fg-muted); font-size: 0.7rem; margin: 0;">Importing JSON into a non-empty Bitwarden vault will create massive duplication and require extensive manual cleanup.</p>
+                    <p style="color: var(--warning); font-weight: 600; font-size: 0.75rem; margin-bottom: 0.25rem;">⚠️
+                        Warning:</p>
+                    <p style="color: var(--fg-muted); font-size: 0.7rem; margin: 0;">Importing JSON into a populated
+                        Bitwarden vault could create massive duplication of data and may require extensive manual
+                        cleanup.
+                        Only do so at your own risk.</p>
                 </div>
-                
-                <p class="shortcuts-text"><strong>Keyboard Shortcuts:</strong> <kbd>Ctrl/Cmd</kbd>+<kbd>O</kbd> Open | <kbd>Ctrl/Cmd</kbd>+<kbd>S</kbd> Export</p>
             </div>
 
             <!-- Upload Zone -->
-            <div class="upload-zone" id="uploadZone" tabindex="0" role="button" aria-label="Upload a Bitwarden JSON export">
+            <div class="upload-zone" id="uploadZone" tabindex="0" role="button"
+                aria-label="Upload a Bitwarden JSON export">
                 <div class="upload-zone-header">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke: var(--text-muted); margin: 0 auto;">
-                        <path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M9 15l3 -3l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 12l0 9" stroke-width="2" stroke-linecap="round"/>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="stroke: var(--text-muted); margin: 0 auto;">
+                        <path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1" stroke-width="2"
+                            stroke-linecap="round" />
+                        <path d="M9 15l3 -3l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 12l0 9" stroke-width="2" stroke-linecap="round" />
                     </svg>
                     <h2>Drop your Bitwarden JSON export here</h2>
                     <p>or click to browse files</p>
                 </div>
-                
+
                 <button class="btn btn-primary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 13h6m-3-3v6m5.667 3H6.333C5.597 19 5 18.403 5 17.667V6.333C5 5.597 5.597 5 6.333 5h9.334L19 8.333v9.334C19 18.403 18.403 19 17.667 19z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path
+                            d="M9 13h6m-3-3v6m5.667 3H6.333C5.597 19 5 18.403 5 17.667V6.333C5 5.597 5.597 5 6.333 5h9.334L19 8.333v9.334C19 18.403 18.403 19 17.667 19z"
+                            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     Select File
                 </button>
@@ -1417,25 +1563,41 @@
                 <button class="script-tab active" onclick="switchExportTab('web')">Web Vault</button>
                 <button class="script-tab" onclick="switchExportTab('cli')">Bitwarden CLI</button>
             </div>
-            
+
             <div id="export-web" class="export-content">
                 <ol class="instruction-list">
-                    <li>Log in to your <a href="https://vault.bitwarden.com" target="_blank" style="color: var(--accent);">Bitwarden Web Vault</a>.</li>
+                    <li>Log in to your <a href="https://vault.bitwarden.com" target="_blank"
+                            style="color: var(--accent);">Bitwarden Web Vault</a>.</li>
                     <li>Navigate to <strong>Tools</strong> &rarr; <strong>Export Vault</strong>.</li>
-                    <li>Select <strong>.json</strong> as the Format (<strong>Warning:</strong> Do not select Encrypted JSON).</li>
+                    <li>Select <strong>.json</strong> as the Format (<strong>Warning:</strong> Do not select Encrypted
+                        JSON).</li>
                     <li>Enter your Master Password and click <strong>Export Vault</strong>.</li>
                 </ol>
             </div>
-            
+
             <div id="export-cli" class="export-content hidden">
                 <ol class="instruction-list">
                     <li>Open your terminal and login: <code>bw login</code></li>
-                    <li>Unlock your vault: <code>export BW_SESSION="$(bw unlock --raw)"</code> (Bash) or <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)</li>
+                    <li>Unlock your vault: <code>export BW_SESSION="$(bw unlock --raw)"</code> (Bash) or
+                        <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)
+                    </li>
                     <li>Run export command: <code>bw export --format json --output vault.json</code></li>
                     <li>Use the resulting <code>vault.json</code> file in the upload zone below.</li>
                 </ol>
             </div>
         </div>
+
+        <footer class="footer-disclaimer">
+            <p>
+                <strong>⚠️ Open Source Notice & Disclaimer:</strong> Nexo is a free, transparent utility provided "as
+                is." Nexo is built on a simple principle: <strong>Your data belongs to you.</strong> You should have the freedom to
+                move, clean, and manage your vault exactly how you see fit. We provide the logic; you keep the control."
+            </p>
+            <p>
+                <strong>LEGAL NOTICE:</strong> Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an
+                independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.
+            </p>
+        </footer>
 
         <!-- Results Section -->
         <div class="results-section" id="resultsSection">
@@ -1459,22 +1621,49 @@
                         <span class="metric-label">To Merge</span>
                     </div>
                 </div>
-                
+
                 <div class="status-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="deselectAll()" title="Uncheck all items">
-                        Deselect All
+                    <button class="btn btn-secondary btn-sm" onclick="deselectAll()" title="Uncheck all items"
+                        aria-label="Uncheck all items">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                        <span class="btn-label">Clear</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm" onclick="selectRecommended()" title="Reset to automatic recommendations">
-                        Select Recommended
+                    <button class="btn btn-secondary btn-sm" onclick="selectRecommended()"
+                        title="Reset to automatic recommendations" aria-label="Select recommended items">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <span class="btn-label">Auto</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" title="Clear and restart">
-                        Start Over
+                    <button class="btn btn-secondary btn-sm" onclick="clearAllData()" title="Clear and restart"
+                        aria-label="Clear all data and restart">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M3 12a9 9 0 1 0 3-6.708" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                            <path d="M3 4v4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <span class="btn-label">Reset</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm" id="cliScriptBtn" onclick="showCLIScripts()" disabled>
-                        CLI Script
+                    <button class="btn btn-secondary btn-sm" id="cliScriptBtn" onclick="showCLIScripts()"
+                        title="Generate CLI deletion script" aria-label="Generate CLI deletion script" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M8 8l-4 4 4 4M13 16h7" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="btn-label">CLI</span>
                     </button>
-                    <button class="btn btn-primary btn-sm" id="exportBtn" onclick="exportCleanedData()" disabled>
-                        Download JSON
+                    <button class="btn btn-primary btn-sm" id="exportBtn" onclick="exportCleanedData()"
+                        title="Download cleaned JSON" aria-label="Download cleaned JSON" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="btn-label">Export</span>
                     </button>
                 </div>
             </div>
@@ -1505,7 +1694,8 @@
                 </div>
                 <div class="modal-body">
                     <p style="font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 1.5rem;">
-                        This will create a new <strong>Union Record</strong> containing all unique data from this cluster. 
+                        This will create a new <strong>Union Record</strong> containing all unique data from this
+                        cluster.
                         The original items will be marked for deletion.
                     </p>
                     <div id="mergePreviewContent"></div>
@@ -1528,13 +1718,18 @@
                     <div class="script-instructions">
                         <h4>How to use these scripts:</h4>
                         <ol>
-                            <li>Install <a href="https://bitwarden.com/help/cli/" target="_blank" style="color: var(--accent-primary);">Bitwarden CLI</a> if you haven't already</li>
+                            <li>Install <a href="https://bitwarden.com/help/cli/" target="_blank"
+                                    style="color: var(--accent-primary);">Bitwarden CLI</a> if you haven't already</li>
                             <li>Login to your vault: <code>bw login</code></li>
-                            <li>Unlock your vault and set session: <code>export BW_SESSION="$(bw unlock --raw)"</code> (Bash) or <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)</li>
+                            <li>Unlock your vault and set session: <code>export BW_SESSION="$(bw unlock --raw)"</code>
+                                (Bash) or <code>$env:BW_SESSION = bw unlock --raw</code> (PowerShell)</li>
                             <li>Copy the script below and run it in your terminal</li>
                             <li>The script will delete the selected items directly from your vault</li>
                         </ol>
-                        <p style="margin: 0.5rem 0 0 0; font-size: 0.8125rem; color: var(--text-tertiary);"><strong>Note:</strong> This approach is cleaner than re-importing your entire vault as it deletes items directly without creating duplicates.</p>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.8125rem; color: var(--text-tertiary);">
+                            <strong>Note:</strong> This approach is cleaner than re-importing your entire vault as it
+                            deletes items directly without creating duplicates.
+                        </p>
                     </div>
 
                     <div class="script-tabs">
@@ -1558,22 +1753,11 @@
                 </div>
             </div>
         </div>
-        <!-- Footer Disclaimer -->
-        <footer class="footer-disclaimer">
-            <p>
-                <strong>⚠️ DISCLAIMER & LIABILITY WARNING:</strong> This utility is provided "as is" without warranty of any kind. 
-                The creators cannot be held liable for inadvertent deletion of records. 
-                Maintain a secure, original backup of your vault before proceeding. You use this tool at your own risk.
-            </p>
-            <p>
-                <strong>LEGAL NOTICE:</strong> Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.
-            </p>
-        </footer>
-
         <!-- Back to Top -->
         <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Back to top">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
             </svg>
         </button>
 
@@ -1597,9 +1781,7 @@
 
         function initializeApp() {
             initTheme();
-            detectBrowserExtensions();
             setupEventListeners();
-            setupKeyboardShortcuts();
             setupScrollListener();
         }
 
@@ -1685,7 +1867,7 @@
                     fileInput.click();
                 }
             });
-            
+
             uploadZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadZone.classList.add('dragover');
@@ -1698,7 +1880,7 @@
             uploadZone.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadZone.classList.remove('dragover');
-                
+
                 if (e.dataTransfer.files.length > 0) {
                     handleFileUpload(e.dataTransfer.files[0]);
                 }
@@ -1709,6 +1891,18 @@
                 const codeElement = e.target.closest('code');
                 if (codeElement) {
                     copyToClipboard(codeElement.innerText, codeElement);
+                }
+            });
+
+            document.getElementById('cliScriptModal').addEventListener('click', (e) => {
+                if (e.target.id === 'cliScriptModal') {
+                    closeCLIModal();
+                }
+            });
+
+            document.getElementById('mergeModal').addEventListener('click', (e) => {
+                if (e.target.id === 'mergeModal') {
+                    closeMergeModal();
                 }
             });
         }
@@ -1752,90 +1946,6 @@
         }
 
         /**
-         * Setup keyboard shortcuts
-         */
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', (e) => {
-                // Ctrl/Cmd + O: Open file
-                if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-                    e.preventDefault();
-                    document.getElementById('fileInput').click();
-                }
-                
-                // Ctrl/Cmd + S: Export data
-                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    const exportBtn = document.getElementById('exportBtn');
-                    if (!exportBtn.disabled) {
-                        exportCleanedData();
-                    }
-                }
-
-                // Escape: Close modal
-                if (e.key === 'Escape') {
-                    closeCLIModal();
-                    closeMergeModal();
-                }
-            });
-
-            // Close modal when clicking outside
-            document.getElementById('cliScriptModal').addEventListener('click', (e) => {
-                if (e.target.id === 'cliScriptModal') {
-                    closeCLIModal();
-                }
-            });
-
-            document.getElementById('mergeModal').addEventListener('click', (e) => {
-                if (e.target.id === 'mergeModal') {
-                    closeMergeModal();
-                }
-            });
-        }
-
-        /**
-         * Detect browser extensions that might read page data
-         * This is a basic detection - extensions can hide themselves
-         */
-        function detectBrowserExtensions() {
-            const warningDiv = document.getElementById('extensionWarning');
-            const detectedList = document.getElementById('detectedExtensions');
-            const extensionsFound = [];
-
-            // The warning UI is optional. If the markup is not present, skip detection silently.
-            if (!warningDiv || !detectedList) {
-                return;
-            }
-
-            // Check for common extension indicators
-            // Note: This is heuristic-based and may not catch all extensions
-            try {
-                // Chrome/Edge extension detection
-                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-                    extensionsFound.push('Chrome/Edge extensions detected');
-                }
-
-                // Firefox extension detection
-                if (typeof browser !== 'undefined' && browser.runtime) {
-                    extensionsFound.push('Firefox add-ons detected');
-                }
-
-                // Check for modified fetch/XMLHttpRequest (common in extensions)
-                const originalFetch = window.fetch.toString();
-                if (!originalFetch.includes('[native code]')) {
-                    extensionsFound.push('Modified network functions detected (possible extension)');
-                }
-            } catch (e) {
-                console.error('Extension detection error:', e);
-            }
-
-            // Show warning if extensions detected
-            if (extensionsFound.length > 0) {
-                warningDiv.classList.add('show');
-                detectedList.innerHTML = '<strong>Detected:</strong> ' + extensionsFound.join(', ');
-            }
-        }
-
-        /**
          * Handle file upload and processing
          * @param {File} file - The uploaded file
          */
@@ -1848,7 +1958,7 @@
             showLoading(true);
 
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 try {
                     const content = e.target.result;
@@ -1876,7 +1986,7 @@
             try {
                 // Parse JSON
                 const data = JSON.parse(jsonContent);
-                
+
                 // Validate Bitwarden format
                 if (!validateBitwardenFormat(data)) {
                     return;
@@ -1888,14 +1998,14 @@
                 // Store original data for export
                 originalData = data;
                 folders = data.folders || [];
-                
+
                 // Build a UI-safe mirror of the raw vault data.
                 // The source export stays in memory locally and is never transmitted.
                 items = parseItemsSafely(data.items || []);
-                
+
                 // Find duplicates
                 duplicateClusters = findDuplicates(items);
-                
+
                 // Render results
                 renderClusters();
                 updateStats();
@@ -1918,18 +2028,18 @@
             // Check if encrypted
             if (data.encrypted === true) {
                 alert('❌ Error: Encrypted exports are not supported.\n\n' +
-                      'Please export your vault as UNENCRYPTED JSON:\n' +
-                      '1. In Bitwarden, go to Tools → Export Vault\n' +
-                      '2. Set File Format to ".json" (not .json (Encrypted))\n' +
-                      '3. Export and upload the file here');
+                    'Please export your vault as UNENCRYPTED JSON:\n' +
+                    '1. In Bitwarden, go to Tools → Export Vault\n' +
+                    '2. Set File Format to ".json" (not .json (Encrypted))\n' +
+                    '3. Export and upload the file here');
                 showLoading(false);
                 return false;
             }
 
             // Check required fields
-            if (!data.hasOwnProperty('folders') || !data.hasOwnProperty('items')) {
+            if (!data.hasOwnProperty('items')) {
                 alert('❌ Error: This doesn\'t appear to be a valid Bitwarden export.\n\n' +
-                      'Missing required fields: folders or items array.');
+                    'Missing required field: items array.');
                 showLoading(false);
                 return false;
             }
@@ -1978,6 +2088,8 @@
                 hasPassword: false,
                 hasTOTP: false,
                 hasFido2: false,
+                totp: null,
+                fido2Credentials: [],
                 password: null,
                 maskedPassword: null,
 
@@ -2002,8 +2114,12 @@
 
             if (item.type === 1 && item.login) {
                 safeItem.username = item.login.username || null;
-                safeItem.hasTOTP = !!item.login.totp;
-                safeItem.hasFido2 = Array.isArray(item.login.fido2Credentials) && item.login.fido2Credentials.length > 0;
+                safeItem.totp = item.login.totp || null;
+                safeItem.fido2Credentials = Array.isArray(item.login.fido2Credentials)
+                    ? JSON.parse(JSON.stringify(item.login.fido2Credentials))
+                    : [];
+                safeItem.hasTOTP = !!safeItem.totp;
+                safeItem.hasFido2 = safeItem.fido2Credentials.length > 0;
 
                 if (Array.isArray(item.login.uris)) {
                     safeItem.uris = item.login.uris.map(uriEntry => uriEntry.uri).filter(Boolean);
@@ -2026,19 +2142,19 @@
          */
         function maskPassword(password) {
             if (!password) return '';
-            
+
             const len = password.length;
-            
+
             // If 5 or fewer characters, mask all with *
             if (len <= 5) {
                 return '*'.repeat(len);
             }
-            
+
             // Show first char + **** + last 4 chars
             const first = password[0];
             const last4 = password.slice(-4);
             const middle = '*'.repeat(Math.max(1, len - 5));
-            
+
             return first + middle + last4;
         }
 
@@ -2049,7 +2165,7 @@
          */
         function findDuplicates(items) {
             const clusters = [];
-            
+
             // Group by Primary Keys (Login: Username+URI, Card: Number, Identity: Email)
             const groups = {
                 login: {},
@@ -2084,7 +2200,7 @@
             [groups.login, groups.card, groups.identity, groups.nameOnly].forEach(category => {
                 Object.entries(category).forEach(([key, groupItems]) => {
                     if (groupItems.length < 2) return;
-                    
+
                     // Skip 'no-key' catch-alls for automatic clustering
                     if (key.includes('no-user') || key.includes('no-uri') || key.includes('no-number') || key.includes('no-email')) {
                         // For these, only cluster if Name is also identical
@@ -2112,9 +2228,14 @@
         function createCluster(groupItems) {
             const cluster = {
                 items: groupItems,
-                matchCriteria: ['Identity Match'],
+                matchScore: calculateClusterMatchScore(groupItems),
+                matchTags: [],
                 hasConflict: false,
-                mergeCandidate: false
+                mergeCandidate: false,
+                hasDifferentFolder: false,
+                hasDifferentUris: false,
+                hasDifferentNotes: false,
+                targetedMergeId: null
             };
 
             // Pairwise comparison for divergence and conflicts
@@ -2130,7 +2251,20 @@
 
                     // Check for Merge Candidate (Complementary data)
                     const hasUriDifference = haveDifferentUris(a.uris, b.uris);
-                    const hasNotesDifference = Boolean(a.notes) !== Boolean(b.notes);
+                    const hasNotesDifference = normalizeComparableValue(a.notes) !== normalizeComparableValue(b.notes);
+                    const hasFolderDifference = normalizeComparableValue(a.folderId) !== normalizeComparableValue(b.folderId);
+
+                    if (hasUriDifference) {
+                        cluster.hasDifferentUris = true;
+                    }
+
+                    if (hasNotesDifference) {
+                        cluster.hasDifferentNotes = true;
+                    }
+
+                    if (hasFolderDifference) {
+                        cluster.hasDifferentFolder = true;
+                    }
 
                     if ((a.hasTOTP && !b.hasTOTP) || (!a.hasTOTP && b.hasTOTP) ||
                         (a.hasFido2 && !b.hasFido2) || (!a.hasFido2 && b.hasFido2) ||
@@ -2140,6 +2274,8 @@
                     }
                 }
             }
+
+            cluster.matchTags = buildClusterMatchTags(cluster);
 
             // Auto-selection logic
             rankAndSuggest(cluster);
@@ -2157,7 +2293,7 @@
             const usernames = cluster.items.map(i => normalizeUsername(i.username));
             const baseUsernames = usernames.map(u => u.replace(/\s*\(.*?\)\s*$/, '').trim());
             const hasSSOSuffixMatches = new Set(baseUsernames).size < baseUsernames.length && new Set(usernames).size > 1;
-            
+
             const names = cluster.items.map(i => i.name.toLowerCase().trim());
             const hasURLNameDivergence = names.some(n => n.includes('.') && names.some(m => !m.includes('.') && m.split(' ')[0] === n.split('.')[0]));
 
@@ -2165,7 +2301,7 @@
             const ranked = [...cluster.items].sort((a, b) => {
                 let scoreA = calculateCompleteness(a) + (a.favorite ? 10 : 0) + (a.hasPasswordHistory ? 5 : 0);
                 let scoreB = calculateCompleteness(b) + (b.favorite ? 10 : 0) + (b.hasPasswordHistory ? 5 : 0);
-                
+
                 // Native folder priority
                 const isImportA = isImportFolder(a.folderId);
                 const isImportB = isImportFolder(b.folderId);
@@ -2177,19 +2313,19 @@
             });
 
             const master = ranked[0];
-            
+
             // 3. Mark others for deletion ONLY if they meet the safety criteria
             ranked.slice(1).forEach(item => {
                 // Rule: Don't auto-suggest if names are just URL vs Display Name divergence
                 if (hasURLNameDivergence) return;
-                
+
                 // Rule: Don't auto-suggest if it's an SSO suffix match (user must choose)
                 if (hasSSOSuffixMatches) return;
 
                 // Rule: Auto-suggest if it's in an import folder vs a native one
                 const isImportItem = isImportFolder(item.folderId);
                 const isMasterNative = !isImportFolder(master.folderId);
-                
+
                 if ((isImportItem && isMasterNative) || isStub(item, master)) {
                     itemsToDelete.add(item.id);
                 }
@@ -2293,6 +2429,110 @@
             return false;
         }
 
+        function getComparableFido2Value(item) {
+            return JSON.stringify(Array.isArray(item.fido2Credentials) ? item.fido2Credentials : []);
+        }
+
+        function getMatchTagIcon(kind) {
+            const icons = {
+                identity: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="2" stroke="currentColor" stroke-width="1.8"/><path d="M14 9h3M14 12h3M7.5 15c1.1-1.1 2.6-1.7 4.5-1.7s3.4.6 4.5 1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+                merge: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 7h4a3 3 0 0 1 3 3v0.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 10l3-3-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                folder: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
+                uri: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 14a4 4 0 0 1 0-5.7l1.1-1.1a4 4 0 0 1 5.7 5.7L16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 10a4 4 0 0 1 0 5.7l-1.1 1.1a4 4 0 0 1-5.7-5.7L8 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                notes: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9l3 3v13H6V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 4v3h3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11h8M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+                conflict: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 16h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+                score: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+            };
+
+            return icons[kind] || '';
+        }
+
+        function calculateClusterMatchScore(groupItems) {
+            if (!Array.isArray(groupItems) || groupItems.length < 2) return 0;
+
+            const weightedFields = [
+                { extractor: item => normalizeComparableValue(item.username), weight: 25 },
+                { extractor: item => normalizeComparableValue(item.password), weight: 25 },
+                { extractor: item => normalizeComparableValue(item.totp), weight: 25 },
+                { extractor: item => normalizeComparableValue(getComparableFido2Value(item)), weight: 25 }
+            ];
+
+            return weightedFields.reduce((total, field) => {
+                const firstValue = field.extractor(groupItems[0]);
+                const matches = groupItems.every(item => field.extractor(item) === firstValue);
+                return total + (matches ? field.weight : 0);
+            }, 0);
+        }
+
+        function buildClusterMatchTags(cluster) {
+            const tags = [
+                {
+                    label: `Identity Match: ${cluster.matchScore}%`,
+                    icon: getMatchTagIcon('identity'),
+                    title: 'Identity Match score based on username, password, TOTP, and FIDO2.',
+                    className: 'tag-identity'
+                }
+            ];
+
+            if (cluster.mergeCandidate && !cluster.hasConflict) {
+                tags.push({
+                    label: 'Merge Candidate',
+                    icon: getMatchTagIcon('merge'),
+                    title: 'The cluster has complementary data that can be synthesized into one record.',
+                    className: 'tag-merge'
+                });
+            }
+
+            if (cluster.hasDifferentFolder) {
+                tags.push({
+                    label: 'Different Folder',
+                    icon: getMatchTagIcon('folder'),
+                    title: 'The records live in different folders.',
+                    className: 'tag-difference'
+                });
+            }
+
+            if (cluster.hasDifferentUris) {
+                tags.push({
+                    label: 'Different URI',
+                    icon: getMatchTagIcon('uri'),
+                    title: 'The records point to different URIs.',
+                    className: 'tag-difference'
+                });
+            }
+
+            if (cluster.hasDifferentNotes) {
+                tags.push({
+                    label: 'Different Notes',
+                    icon: getMatchTagIcon('notes'),
+                    title: 'The records contain different notes.',
+                    className: 'tag-difference'
+                });
+            }
+
+            if (cluster.hasConflict) {
+                tags.push({
+                    label: 'Password Conflict',
+                    icon: getMatchTagIcon('conflict'),
+                    title: 'The records have different passwords, so auto-selection is disabled.',
+                    className: 'tag-conflict'
+                });
+            }
+
+            return tags;
+        }
+
+        function renderMatchTag(tag) {
+            const classes = ['match-tag'];
+            if (tag.className) {
+                classes.push(tag.className);
+            }
+
+            const title = tag.title ? ` title="${escapeAttribute(tag.title)}"` : '';
+            const icon = tag.icon ? `<span class="match-tag-icon" aria-hidden="true">${tag.icon}</span>` : '';
+            return `<span class="${classes.join(' ')}"${title}>${icon}<span>${escapeHtml(tag.label)}</span></span>`;
+        }
+
         function isImportFolder(folderId) {
             return getFolderName(folderId).toLowerCase().includes('import');
         }
@@ -2319,6 +2559,119 @@
             });
         }
 
+        function getPreferredMergeBaseItem(groupItems) {
+            return [...groupItems].sort((a, b) => new Date(b.revisionDate) - new Date(a.revisionDate))[0];
+        }
+
+        function getTargetedMergeRecord(cluster) {
+            if (!cluster || !cluster.targetedMergeId || !originalData || !Array.isArray(originalData.items)) {
+                return null;
+            }
+
+            return originalData.items.find(item => item.id === cluster.targetedMergeId && item.isNexoMerge) || null;
+        }
+
+        function getTargetedMergeCount() {
+            return duplicateClusters.filter(cluster => Boolean(cluster.targetedMergeId)).length;
+        }
+
+        function buildMergeDraft(cluster) {
+            const synthesized = synthesizeRecord(cluster.items);
+            const existingMergeRecord = getTargetedMergeRecord(cluster);
+
+            if (!existingMergeRecord) {
+                return synthesized;
+            }
+
+            synthesized.id = existingMergeRecord.id;
+            synthesized.name = existingMergeRecord.name || synthesized.name;
+            synthesized.notes = existingMergeRecord.notes || synthesized.notes;
+
+            if (existingMergeRecord.login) {
+                synthesized.username = existingMergeRecord.login.username || synthesized.username;
+                synthesized.password = existingMergeRecord.login.password || synthesized.password;
+                synthesized.hasPassword = !!existingMergeRecord.login.password || synthesized.hasPassword;
+                synthesized.hasTOTP = !!existingMergeRecord.login.totp || synthesized.hasTOTP;
+                synthesized.hasFido2 = Array.isArray(existingMergeRecord.login.fido2Credentials) && existingMergeRecord.login.fido2Credentials.length > 0 || synthesized.hasFido2;
+
+                if (Array.isArray(existingMergeRecord.login.uris)) {
+                    synthesized.uris = existingMergeRecord.login.uris.map(uriEntry => uriEntry.uri).filter(Boolean);
+                }
+            }
+
+            return synthesized;
+        }
+
+        function readMergeDraftFromModal(defaultDraft) {
+            const nameInput = document.getElementById('mergeNameInput');
+            const usernameInput = document.getElementById('mergeUsernameInput');
+            const passwordInput = document.getElementById('mergePasswordInput');
+            const uriInput = document.getElementById('mergeUrisInput');
+            const nextDraft = {
+                ...defaultDraft,
+                name: defaultDraft.name
+            };
+
+            if (nameInput) {
+                nextDraft.name = nameInput.value.trim() || defaultDraft.name || 'Unnamed Item';
+            }
+
+            if (usernameInput) {
+                nextDraft.username = usernameInput.value.trim() || null;
+            }
+
+            if (passwordInput) {
+                nextDraft.password = passwordInput.value || null;
+                nextDraft.hasPassword = !!nextDraft.password;
+            }
+
+            if (uriInput) {
+                const seenUris = new Set();
+                nextDraft.uris = uriInput.value
+                    .split('\n')
+                    .map(uri => uri.trim())
+                    .filter(uri => {
+                        const normalized = normalizeComparableValue(uri);
+                        if (!normalized || seenUris.has(normalized)) return false;
+                        seenUris.add(normalized);
+                        return true;
+                    });
+            }
+
+            return nextDraft;
+        }
+
+        function buildMergedUriObjects(cluster, uriStrings) {
+            const sourceUriEntries = [];
+            const existingMergeRecord = getTargetedMergeRecord(cluster);
+
+            if (existingMergeRecord && existingMergeRecord.login && Array.isArray(existingMergeRecord.login.uris)) {
+                existingMergeRecord.login.uris.forEach(uriEntry => sourceUriEntries.push(uriEntry));
+            }
+
+            cluster.items.forEach(item => {
+                const originalItem = originalData.items[item.originalIndex];
+                if (originalItem.login && Array.isArray(originalItem.login.uris)) {
+                    originalItem.login.uris.forEach(uriEntry => sourceUriEntries.push(uriEntry));
+                }
+            });
+
+            const seenUris = new Set();
+
+            return uriStrings.reduce((uniqueUris, uri) => {
+                const normalizedUri = normalizeComparableValue(uri);
+                if (!normalizedUri || seenUris.has(normalizedUri)) {
+                    return uniqueUris;
+                }
+
+                seenUris.add(normalizedUri);
+
+                const existingUri = sourceUriEntries.find(uriEntry => normalizeComparableValue(uriEntry.uri) === normalizedUri);
+                uniqueUris.push(existingUri ? JSON.parse(JSON.stringify(existingUri)) : { match: null, uri });
+                return uniqueUris;
+            }, []);
+        }
+
         /**
          * Preview a potential merge of items in a cluster
          * @param {number} clusterIndex - Cluster index
@@ -2329,20 +2682,42 @@
             const content = document.getElementById('mergePreviewContent');
             const confirmBtn = document.getElementById('confirmMergeBtn');
 
-            // Synthesize the merged record (preview only)
-            const synthesized = synthesizeRecord(cluster.items);
+            const synthesized = buildMergeDraft(cluster);
+            const hasUriEditor = synthesized.type === 1;
 
             content.innerHTML = `
-                <div class="item-card" style="border-color: var(--teal-mid); background: var(--bg-muted);">
-                    <div class="item-name">${escapeHtml(synthesized.name)}</div>
-                    <div class="item-details" style="margin-top: 1rem;">
+                <div class="item-card merge-preview-card">
+                    <div class="merge-edit-grid">
+                        <label class="merge-edit-field">
+                            <span class="detail-label">Name</span>
+                            <input
+                                type="text"
+                                id="mergeNameInput"
+                                class="merge-edit-input"
+                                value="${escapeAttribute(synthesized.name)}"
+                                aria-label="Merged record name"
+                            >
+                        </label>
+                        ${hasUriEditor ? `
+                            <label class="merge-edit-field">
+                                <span class="detail-label">URIs</span>
+                                <textarea
+                                    id="mergeUrisInput"
+                                    class="merge-edit-textarea"
+                                    aria-label="Merged record URIs"
+                                >${escapeHtml(synthesized.uris.join('\n'))}</textarea>
+                                <span class="merge-field-hint">One URI per line. Leave blank if this merged record should not include a login URI.</span>
+                            </label>
+                        ` : ''}
+                    </div>
+                    <div class="item-details">
                         <div class="item-detail">
                             <span class="detail-label">User:</span>
                             <span class="detail-value">${escapeHtml(synthesized.username || '(none)')}</span>
                         </div>
                         <div class="item-detail">
                             <span class="detail-label">URIs:</span>
-                            <span class="detail-value">${synthesized.uris.length} URI(s) consolidated</span>
+                            <span class="detail-value">${synthesized.uris.length} URI(s) targeted</span>
                         </div>
                         <div class="item-detail">
                             <span class="detail-label">Security:</span>
@@ -2360,7 +2735,8 @@
                 </div>
             `;
 
-            confirmBtn.onclick = () => executeMerge(clusterIndex, synthesized);
+            confirmBtn.textContent = cluster.targetedMergeId ? 'Update Merge' : 'Approve & Merge';
+            confirmBtn.onclick = () => executeMerge(clusterIndex, readMergeDraftFromModal(synthesized));
             modal.classList.add('show');
         }
 
@@ -2369,8 +2745,8 @@
          */
         function synthesizeRecord(groupItems) {
             // Use the newest record as the base
-            const base = [...groupItems].sort((a, b) => new Date(b.revisionDate) - new Date(a.revisionDate))[0];
-            
+            const base = getPreferredMergeBaseItem(groupItems);
+
             const union = {
                 ...base,
                 id: generateUUID(),
@@ -2408,64 +2784,71 @@
          */
         function executeMerge(clusterIndex, synthesized) {
             const cluster = duplicateClusters[clusterIndex];
-            
-            // 1. Ensure [ MERGED ] folder exists in originalData
-            let mergeFolder = originalData.folders.find(f => f.name === '[ MERGED ]');
-            if (!mergeFolder) {
-                const folderId = generateUUID();
-                mergeFolder = { name: '[ MERGED ]', id: folderId };
-                originalData.folders.push(mergeFolder);
-                folders = originalData.folders;
-            }
+            const existingMergeRecord = getTargetedMergeRecord(cluster);
 
             // 2. Prepare the full Bitwarden object for the synthesized record
-            const newRecord = JSON.parse(JSON.stringify(originalData.items[cluster.items[0].originalIndex]));
-            newRecord.id = synthesized.id;
-            newRecord.folderId = mergeFolder.id;
+            const baseItem = getPreferredMergeBaseItem(cluster.items);
+            const baseRecord = existingMergeRecord || originalData.items[baseItem.originalIndex];
+            const newRecord = JSON.parse(JSON.stringify(baseRecord));
+            newRecord.id = existingMergeRecord ? existingMergeRecord.id : synthesized.id;
             newRecord.name = synthesized.name;
             newRecord.notes = synthesized.notes;
             newRecord.isNexoMerge = true; // Tag for CLI script generation
-            
+
             // Add all unique URIs back to the real object
             if (newRecord.login) {
-                const uniqueURIs = [];
-                const uriStrings = new Set();
-                cluster.items.forEach(item => {
-                    const originalItem = originalData.items[item.originalIndex];
-                    if (originalItem.login && originalItem.login.uris) {
-                        originalItem.login.uris.forEach(uObj => {
-                            if (!uriStrings.has(uObj.uri)) {
-                                uriStrings.add(uObj.uri);
-                                uniqueURIs.push(uObj);
-                            }
-                        });
-                    }
-                });
-                newRecord.login.uris = uniqueURIs;
-                
+                newRecord.login.username = synthesized.username || null;
+                newRecord.login.password = synthesized.password || null;
+                newRecord.login.uris = buildMergedUriObjects(cluster, synthesized.uris);
+
                 // Pick the item with TOTP to copy the secret
                 const itemWithTOTP = cluster.items.find(i => i.hasTOTP);
                 if (itemWithTOTP) {
-                    newRecord.login.totp = originalData.items[itemWithTOTP.originalIndex].login.totp;
+                    const originalItem = originalData.items[itemWithTOTP.originalIndex];
+                    if (originalItem && originalItem.login && originalItem.login.totp) {
+                        newRecord.login.totp = originalItem.login.totp;
+                    }
                 }
             }
 
             // 3. Add to vault
-            originalData.items.push(newRecord);
-            items.push(createSafeItem(newRecord, originalData.items.length - 1));
-            
-            // 4. Mark originals for deletion
-            cluster.items.forEach(item => setItemMarkedState(item.id, true));
+            let newRecordIndex = originalData.items.findIndex(item => item.id === newRecord.id);
+            if (newRecordIndex === -1) {
+                originalData.items.push(newRecord);
+                newRecordIndex = originalData.items.length - 1;
+            } else {
+                originalData.items[newRecordIndex] = newRecord;
+            }
+
+            const safeRecord = createSafeItem(newRecord, newRecordIndex);
+            const safeRecordIndex = items.findIndex(item => item.id === newRecord.id);
+            if (safeRecordIndex === -1) {
+                items.push(safeRecord);
+            } else {
+                items[safeRecordIndex] = safeRecord;
+            }
+
+            cluster.targetedMergeId = newRecord.id;
+
+            // 4. Mark duplicates for deletion, EXCEPT the newly updated record
+            cluster.items.forEach(item => {
+                if (item.id !== newRecord.id) {
+                    setItemMarkedState(item.id, true);
+                } else {
+                    setItemMarkedState(item.id, false);
+                }
+            });
 
             // 5. Refresh UI
             closeMergeModal();
             renderClusters();
             updateStats();
-            alert('✓ Record synthesized and originals marked for deletion.');
+            alert(existingMergeRecord ? '✓ Record updated and duplicates remain marked for deletion.' : '✓ Record updated and duplicates marked for deletion.');
         }
 
         function closeMergeModal() {
             document.getElementById('mergeModal').classList.remove('show');
+            document.getElementById('confirmMergeBtn').textContent = 'Approve & Merge';
         }
 
         /**
@@ -2478,14 +2861,6 @@
             duplicateClusters.forEach((cluster, clusterIndex) => {
                 const clusterDiv = document.createElement('div');
                 clusterDiv.className = 'cluster';
-                
-                let extraTags = '';
-                if (cluster.hasConflict) {
-                    extraTags += `<span class="match-tag tag-conflict">⚠️ Password Conflict</span>`;
-                }
-                if (cluster.mergeCandidate && !cluster.hasConflict) {
-                    extraTags += `<span class="match-tag tag-merge">🧬 Merge Candidate</span>`;
-                }
 
                 clusterDiv.innerHTML = `
                     <div class="cluster-header">
@@ -2493,15 +2868,14 @@
                             <div class="cluster-title">
                                 Cluster ${clusterIndex + 1}
                                 <div class="match-tags">
-                                    ${cluster.matchCriteria.map(c => `<span class="match-tag">${c}</span>`).join('')}
-                                    ${extraTags}
+                                    ${cluster.matchTags.map(renderMatchTag).join('')}
                                 </div>
                             </div>
                         </div>
                         <div class="cluster-actions">
                             ${cluster.mergeCandidate && !cluster.hasConflict ? `
                                 <button class="btn btn-primary btn-sm" onclick="previewMerge(${clusterIndex})" style="background: var(--teal-mid);">
-                                    Review & Merge
+                                    ${cluster.targetedMergeId ? 'Edit Merge' : 'Review & Merge'}
                                 </button>
                             ` : ''}
                             <button class="btn btn-secondary btn-sm" onclick="keepNewestInCluster(${clusterIndex})">Keep Newest</button>
@@ -2546,7 +2920,7 @@
                         if (field === 'uri') return i.uris.length > 0 ? extractDomain(i.uris[0]) : null;
                         return i[field];
                     });
-                
+
                 const hasMismatch = otherValues.some(v => v !== null && v !== undefined && v !== value);
                 return hasMismatch ? `<span class="divergence-icon" title="Field differs between records">≠</span>` : '';
             };
@@ -2596,7 +2970,7 @@
                             <span class="detail-value ${uriDiv ? 'divergent-value' : ''}">
                                 ${item.uris.length > 0 ? `
                                     <ul class="uri-list">
-                                        ${item.uris.map(uri => `<li>${escapeHtml(uri)}</li>`).join('')}
+                                        ${item.uris.map(uri => `<li>${escapeHtml(extractDomain(uri))}</li>`).join('')}
                                     </ul>
                                 ` : '<span class="detail-value-muted">(none)</span>'} ${uriDiv}
                             </span>
@@ -2729,26 +3103,30 @@
             div.textContent = text;
             return div.innerHTML;
         }
-/**
- * Uncheck all items in all clusters
- */
-function deselectAll() {
-    itemsToDelete.clear();
-    renderClusters();
-    updateStats();
-}
 
-/**
- * Reset selections to the initial automatic recommendations
- */
-function selectRecommended() {
-    itemsToDelete.clear();
-    duplicateClusters.forEach(cluster => {
-        rankAndSuggest(cluster);
-    });
-    renderClusters();
-    updateStats();
-}
+        function escapeAttribute(text) {
+            return escapeHtml(String(text ?? '')).replace(/"/g, '&quot;');
+        }
+        /**
+         * Uncheck all items in all clusters
+         */
+        function deselectAll() {
+            itemsToDelete.clear();
+            renderClusters();
+            updateStats();
+        }
+
+        /**
+         * Reset selections to the initial automatic recommendations
+         */
+        function selectRecommended() {
+            itemsToDelete.clear();
+            duplicateClusters.forEach(cluster => {
+                rankAndSuggest(cluster);
+            });
+            renderClusters();
+            updateStats();
+        }
 
         /**
          * Toggle item deletion status
@@ -2765,7 +3143,7 @@ function selectRecommended() {
          */
         function keepNewestInCluster(clusterIndex) {
             const cluster = duplicateClusters[clusterIndex];
-            
+
             // Find newest item by revisionDate
             let newestItem = cluster.items[0];
             cluster.items.forEach(item => {
@@ -2792,7 +3170,7 @@ function selectRecommended() {
          */
         function selectAllInCluster(clusterIndex) {
             const cluster = duplicateClusters[clusterIndex];
-            
+
             cluster.items.forEach(item => {
                 setItemMarkedState(item.id, true);
             });
@@ -2807,13 +3185,13 @@ function selectRecommended() {
             document.getElementById('totalItems').textContent = items.length;
             document.getElementById('duplicateClusters').textContent = duplicateClusters.length;
             document.getElementById('markedForDeletion').textContent = itemsToDelete.size;
-            document.getElementById('mergeCandidates').textContent = duplicateClusters.filter(cluster => cluster.mergeCandidate && !cluster.hasConflict).length;
-            
+            document.getElementById('mergeCandidates').textContent = getTargetedMergeCount();
+
             // Manage section visibility
             document.getElementById('exportGuide').classList.add('hidden');
             document.getElementById('gettingStarted').classList.add('hidden');
             document.getElementById('resultsSection').classList.add('show');
-            
+
             if (duplicateClusters.length === 0) {
                 document.getElementById('noDuplicatesMsg').classList.remove('hidden');
                 document.getElementById('clustersContainer').classList.add('hidden');
@@ -2825,9 +3203,9 @@ function selectRecommended() {
             // Enable export and CLI script buttons if items are marked for deletion or merged
             const exportBtn = document.getElementById('exportBtn');
             const cliScriptBtn = document.getElementById('cliScriptBtn');
-            const hasMerges = originalData.items.some(i => i.isNexoMerge);
+            const hasMerges = getTargetedMergeCount() > 0;
             const hasChanges = itemsToDelete.size > 0 || hasMerges;
-            
+
             exportBtn.disabled = !hasChanges;
             cliScriptBtn.disabled = !hasChanges;
         }
@@ -2884,8 +3262,8 @@ function selectRecommended() {
                 const filename = `nexo_cleaned_${timestamp}.json`;
 
                 // Create and download file
-                const blob = new Blob([JSON.stringify(cleanedData, null, 2)], { 
-                    type: 'application/json' 
+                const blob = new Blob([JSON.stringify(cleanedData, null, 2)], {
+                    type: 'application/json'
                 });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2895,17 +3273,17 @@ function selectRecommended() {
                 URL.revokeObjectURL(url);
 
                 alert(`✓ Export successful!\n\n` +
-                      `File: ${filename}\n` +
-                      `Removed: ${itemsToDelete.size} item(s)\n` +
-                      `Remaining: ${cleanedData.items.length} item(s)\n\n` +
-                      `IMPORT INSTRUCTIONS:\n` +
-                      `1. Open Bitwarden (Web Vault or Desktop App)\n` +
-                      `2. Go to Tools → Import Data\n` +
-                      `3. Select format: "Bitwarden (json)"\n` +
-                      `4. Choose the downloaded file: ${filename}\n` +
-                      `5. Click Import\n\n` +
-                      `The existing folder structure is preserved in the export.\n` +
-                      `Review the import carefully before replacing your main vault.`);
+                    `File: ${filename}\n` +
+                    `Removed: ${itemsToDelete.size} item(s)\n` +
+                    `Remaining: ${cleanedData.items.length} item(s)\n\n` +
+                    `IMPORT INSTRUCTIONS:\n` +
+                    `1. Open Bitwarden (Web Vault or Desktop App)\n` +
+                    `2. Go to Tools → Import Data\n` +
+                    `3. Select format: "Bitwarden (json)"\n` +
+                    `4. Choose the downloaded file: ${filename}\n` +
+                    `5. Click Import\n\n` +
+                    `The existing folder structure is preserved in the export.\n` +
+                    `Review the import carefully before replacing your main vault.`);
             } catch (error) {
                 console.error('Export error:', error);
                 alert('❌ Error exporting data: ' + error.message);
@@ -2920,7 +3298,7 @@ function selectRecommended() {
                 return crypto.randomUUID();
             }
 
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0;
                 const v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
@@ -2953,41 +3331,75 @@ function selectRecommended() {
                     const cleanItem = JSON.parse(JSON.stringify(item));
                     delete cleanItem.isNexoMerge;
                     delete cleanItem.id; // BW CLI will assign a new ID on creation
+
+                    // Remove read-only/metadata fields that 'bw create item' may reject
+                    delete cleanItem.revisionDate;
+                    delete cleanItem.creationDate;
+                    delete cleanItem.passwordHistory;
+
                     return {
                         name: item.name,
                         json: JSON.stringify(cleanItem)
                     };
                 });
 
+            const escapeShellSingleQuoted = (text) => String(text).replace(/'/g, `'\''`);
+            const escapePowerShellSingleQuoted = (text) => String(text).replace(/'/g, "''");
+
             // Generate Bash script
-            let bashScript = `#!/bin/bash\n\n`;
+            let bashScript = `#!/bin/bash\nset -euo pipefail\n\n`;
             bashScript += `# Nexo CLI Automation Script\n`;
             bashScript += `# Generated: ${new Date().toISOString()}\n`;
             bashScript += `# Items to delete: ${itemsArray.length}\n`;
             bashScript += `# Merged records to create: ${mergesArray.length}\n\n`;
             bashScript += `# Make sure you're logged in and have BW_SESSION set:\n`;
-            bashScript += `# export BW_SESSION="$(bw unlock --raw)"\n\n`;
-            
+            bashScript += `export BW_SESSION="$(bw unlock --raw)"\n\n`;
+
+            bashScript += `print_step() { printf '\\033[36m[→]\\033[0m %s\\n' "$1"; }\n`;
+            bashScript += `print_success() { printf '\\033[32m[✓]\\033[0m %s\\n' "$1"; }\n`;
+            bashScript += `print_failure() { printf '\\033[31m[✗]\\033[0m %s\\n' "$1"; }\n\n`;
+
+            bashScript += `print_step 'Syncing vault before applying changes'\n`;
+            bashScript += `if bw sync; then\n`;
+            bashScript += `  print_success 'Vault synced successfully'\n`;
+            bashScript += `else\n`;
+            bashScript += `  print_failure 'Vault sync failed'\n`;
+            bashScript += `  exit 1\n`;
+            bashScript += `fi\n\n`;
+
             if (mergesArray.length > 0) {
-                bashScript += `echo "Creating ${mergesArray.length} merged records..."\n`;
+                bashScript += `print_step 'Creating merged records'\n`;
                 mergesArray.forEach((merge, index) => {
                     bashScript += `# Merge ${index + 1}: ${merge.name}\n`;
-                    // Use a here-doc or quoted string for the JSON
-                    bashScript += `echo '${merge.json.replace(/'/g, "'\\''")}' | bw create item\n`;
+                    const shellName = escapeShellSingleQuoted(merge.name);
+                    const shellJson = escapeShellSingleQuoted(merge.json);
+                    bashScript += `print_step 'Creating merged record: ${shellName}'\n`;
+                    bashScript += `if echo '${shellJson}' | bw encode | bw create item; then\n`;
+                    bashScript += `  print_success 'Created merged record: ${shellName}'\n`;
+                    bashScript += `else\n`;
+                    bashScript += `  print_failure 'Failed to create merged record: ${shellName}'\n`;
+                    bashScript += `  exit 1\n`;
+                    bashScript += `fi\n`;
                 });
                 bashScript += `\n`;
             }
 
             if (itemsArray.length > 0) {
-                bashScript += `echo "Deleting ${itemsArray.length} items from Bitwarden vault..."\n`;
+                bashScript += `print_step 'Deleting selected items'\n`;
                 itemsArray.forEach((item, index) => {
                     bashScript += `# Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `bw delete item ${item.id}\n`;
+                    const shellName = escapeShellSingleQuoted(item.name);
+                    bashScript += `print_step 'Deleting item: ${shellName}'\n`;
+                    bashScript += `if bw delete item ${item.id}; then\n`;
+                    bashScript += `  print_success 'Deleted item: ${shellName}'\n`;
+                    bashScript += `else\n`;
+                    bashScript += `  print_failure 'Failed to delete item: ${shellName}'\n`;
+                    bashScript += `  exit 1\n`;
+                    bashScript += `fi\n`;
                 });
             }
-            
-            bashScript += `\necho "✓ Cleanup complete!"\n`;
-            bashScript += `bw sync\n`;
+
+            bashScript += `\nprint_success 'Cleanup complete'\n`;
 
             // Generate PowerShell script
             let psScript = `# Nexo CLI Automation Script\n`;
@@ -2995,29 +3407,50 @@ function selectRecommended() {
             psScript += `# Items to delete: ${itemsArray.length}\n`;
             psScript += `# Merged records to create: ${mergesArray.length}\n\n`;
             psScript += `# Make sure you're logged in and have BW_SESSION set:\n`;
-            psScript += `# $env:BW_SESSION = bw unlock --raw\n\n`;
-            
+            psScript += `$env:BW_SESSION = bw unlock --raw\n\n`;
+
+            psScript += `$ErrorActionPreference = 'Stop'\n`;
+            psScript += `function Write-Step { param([string]$Message) Write-Host "→ $Message" -ForegroundColor Cyan }\n`;
+            psScript += `function Write-Success { param([string]$Message) Write-Host "✓ $Message" -ForegroundColor Green }\n`;
+            psScript += `function Write-Failure { param([string]$Message) Write-Host "✗ $Message" -ForegroundColor Red }\n\n`;
+
+            psScript += `Write-Step 'Syncing vault before applying changes'\n`;
+            psScript += `bw sync\n`;
+            psScript += `if ($LASTEXITCODE -eq 0) {\n`;
+            psScript += `    Write-Success 'Vault synced successfully'\n`;
+            psScript += `} else {\n`;
+            psScript += `    Write-Failure 'Vault sync failed'\n`;
+            psScript += `    exit 1\n`;
+            psScript += `}\n\n`;
+
             if (mergesArray.length > 0) {
-                psScript += `Write-Host "Creating ${mergesArray.length} merged records..."\n`;
+                psScript += `Write-Step 'Creating merged records'\n`;
                 mergesArray.forEach((merge, index) => {
                     psScript += `# Merge ${index + 1}: ${merge.name}\n`;
-                    // PowerShell string escaping for JSON is tricky; using @'' here-string approach
-                    const escapedJson = merge.json.replace(/'/g, "''");
-                    psScript += `@'\n${merge.json}\n'@ | bw create item\n`;
+                    const psName = escapePowerShellSingleQuoted(merge.name);
+                    const psJson = escapePowerShellSingleQuoted(merge.json);
+                    psScript += `Write-Step 'Creating merged record: ${psName}'\n`;
+                    psScript += `$mergeJson = @'\n${psJson}\n'@\n`;
+                    psScript += `$encodedMerge = $mergeJson | bw encode\n`;
+                    psScript += `if ($LASTEXITCODE -ne 0) { Write-Failure 'Failed to encode merged record: ${psName}'; exit 1 }\n`;
+                    psScript += `$encodedMerge | bw create item\n`;
+                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Created merged record: ${psName}' } else { Write-Failure 'Failed to create merged record: ${psName}'; exit 1 }\n`;
                 });
                 psScript += `\n`;
             }
 
             if (itemsArray.length > 0) {
-                psScript += `Write-Host "Deleting ${itemsArray.length} items from Bitwarden vault..."\n`;
+                psScript += `Write-Step 'Deleting selected items'\n`;
                 itemsArray.forEach((item, index) => {
                     psScript += `# Deletion ${index + 1}: ${item.name}\n`;
+                    const psName = escapePowerShellSingleQuoted(item.name);
+                    psScript += `Write-Step 'Deleting item: ${psName}'\n`;
                     psScript += `bw delete item ${item.id}\n`;
+                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Deleted item: ${psName}' } else { Write-Failure 'Failed to delete item: ${psName}'; exit 1 }\n`;
                 });
             }
-            
-            psScript += `\nWrite-Host "✓ Cleanup complete!"\n`;
-            psScript += `bw sync\n`;
+
+            psScript += `\nWrite-Success 'Cleanup complete'\n`;
 
             // Set script content
             document.getElementById('bashScriptText').value = bashScript;
@@ -3103,7 +3536,7 @@ function selectRecommended() {
             document.getElementById('fileInput').value = '';
             closeMergeModal();
             closeCLIModal();
-            
+
             // Clear containers
             document.getElementById('clustersContainer').innerHTML = '';
             document.getElementById('noDuplicatesMsg').classList.add('hidden');
@@ -3158,22 +3591,27 @@ function selectRecommended() {
         }
 
         /**
-         * Apply the selected theme to both the document root and the toggle icons.
-         * Centralizing this avoids subtle drift between initTheme() and toggleTheme().
+         * Apply the selected theme and update the toggle to describe the destination mode.
          * @param {'light'|'dark'} theme - Theme to apply
          */
         function applyTheme(theme) {
             const root = document.documentElement;
             const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
             root.setAttribute('data-theme', resolvedTheme);
-            
-            // Toggle visibility of icons
+
+            // Show the icon for the theme the button will switch to next.
             const lightIcon = document.querySelector('.theme-icon-light');
             const darkIcon = document.querySelector('.theme-icon-dark');
-            
-            if (lightIcon) lightIcon.style.display = resolvedTheme === 'dark' ? 'none' : 'block';
-            if (darkIcon) darkIcon.style.display = resolvedTheme === 'dark' ? 'block' : 'none';
-            
+            const themeToggle = document.getElementById('themeToggle');
+            const nextThemeLabel = resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+
+            if (lightIcon) lightIcon.style.display = resolvedTheme === 'dark' ? 'block' : 'none';
+            if (darkIcon) darkIcon.style.display = resolvedTheme === 'dark' ? 'none' : 'block';
+            if (themeToggle) {
+                themeToggle.title = nextThemeLabel;
+                themeToggle.setAttribute('aria-label', nextThemeLabel);
+            }
+
             storeTheme(resolvedTheme);
         }
 
@@ -3184,11 +3622,11 @@ function selectRecommended() {
         function togglePasswordVisibility(itemId) {
             const pwdElement = document.getElementById(`pwd-${itemId}`);
             if (!pwdElement) return;
-            
+
             const isMasked = pwdElement.getAttribute('data-masked') === 'true';
             const item = items.find(i => i.id === itemId);
             if (!item) return;
-            
+
             if (isMasked) {
                 // Show full password
                 pwdElement.textContent = item.password;
@@ -3201,4 +3639,5 @@ function selectRecommended() {
         }
     </script>
 </body>
+
 </html>

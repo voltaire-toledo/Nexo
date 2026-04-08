@@ -37,6 +37,9 @@ The tool reduces 10,000+ records into actionable clusters, providing visual proo
 - **FR-3.1: Differential Highlighting.** Use wavy underlines and bolding to pinpoint exactly which field values differ in a cluster.
 - **FR-3.2: Burned Teal Palette.** High-contrast, brand-aligned theme (#233F4C Anchor).
 - **FR-3.3: Action Persistence.** Sticky status bar and "Back to Top" for large-scale vault navigation.
+- **FR-3.4: Triage Queue.** Present clusters as a compact review queue grouped by urgency (`Needs Review`, `Merge Candidates`, `Conflicts`, `All`).
+- **FR-3.5: List-Detail Review.** Show one selected cluster in a focused comparison panel while keeping the full queue visible.
+- **FR-3.6: Progressive Disclosure.** Keep secondary detail, merge previews, and destructive controls behind deliberate disclosure rather than showing every field for every cluster at once.
 
 ## 4. Technical Architecture
 
@@ -47,7 +50,40 @@ The tool reduces 10,000+ records into actionable clusters, providing visual proo
 - **Recency**: Tie-breaker (Newest revision wins)
 - **Folder Priority**: Native folders (+20 pts) vs. Import folders.
 
-## 5. Acceptance Criteria (v1.2)
+## 5. Proposed Review Flow 2.0
+
+### 5.1 Primary Layout
+- Sticky summary bar with counts for vault items, clusters, deletions, and merge opportunities.
+- Triage tabs directly beneath the summary bar to reduce the visible problem space.
+- Two-pane review surface:
+  - Left pane: compact cluster list with badges, urgency, and suggested action.
+  - Right pane: focused detail panel for the currently selected cluster.
+
+### 5.2 Cluster List Behavior
+- Default sorting should prioritize:
+  1. password conflicts
+  2. merge candidates
+  3. uncertain clusters
+  4. safe deletion candidates
+- Each row should summarize:
+  - cluster title
+  - record count
+  - confidence or issue type
+  - suggested action
+  - whether records are already selected for deletion or merge
+
+### 5.3 Detail Panel Behavior
+- Show side-by-side records for the active cluster only.
+- Highlight only differing fields by default.
+- Collapse low-signal details until requested.
+- Keep actions (`Keep Newest`, `Mark for Deletion`, `Review & Merge`) fixed near the detail header.
+
+### 5.4 Mobile Adaptation
+- Convert the two-pane layout into a queue view plus drill-in detail view.
+- Preserve the selected-cluster context when returning from the detail screen.
+- Keep primary actions visible without forcing the user to scroll back through the entire queue.
+
+## 6. Acceptance Criteria (v1.2)
 
 ✅ Weighted scoring engine implemented.  
 ✅ Field-level divergence (≠) UI implemented.  
@@ -55,7 +91,7 @@ The tool reduces 10,000+ records into actionable clusters, providing visual proo
 ✅ Burned Teal branding integrated.  
 ✅ Terminal-safe export script provided.  
 
-## 6. Legal Notes
+## 7. Legal Notes
 
 - Bitwarden® is a registered trademark of Bitwarden Inc.
 - Nexo is an independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.

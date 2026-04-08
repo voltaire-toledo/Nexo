@@ -67,9 +67,15 @@ Nexo is now a full-fledged duplicate-cleanup engine. It doesn't just find duplic
 1. Verify synthesized JSON imports correctly into Bitwarden Mobile apps.
 2. Performance test with 20,000+ items to ensure wavy-underline rendering remains fluid.
 
-## Phase 9: UI/UX Review Flow Refactor (Planned)
-- [ ] Replace the long cluster-card feed with a triage-first list-detail layout.
-- [ ] Add review tabs for `Needs Review`, `Merge Candidates`, `Conflicts`, and `All Clusters`.
-- [ ] Introduce compact cluster rows with one selected cluster shown in a focused compare panel.
-- [ ] Keep field-level diffs, merge previews, and destructive actions behind progressive disclosure.
-- [ ] Tune the mobile layout so batch review still feels calm and readable on smaller screens.
+## Phase 9: UI/UX Review Flow Refactor (In Progress 🚧)
+- [🚧] Replace the long cluster-card feed with a triage-first list-detail layout.
+- [🚧] Add review tabs for `Needs Review`, `Merge Candidates`, `Conflicts`, and `All Clusters`.
+- [🚧] Introduce compact cluster rows with one selected cluster shown in a focused compare panel.
+- [🚧] Keep field-level diffs, merge previews, and destructive actions behind progressive disclosure.
+- [⏸️] Defer the REPL-style terminal confirmation pane to the next release.
+- [ ] Define the "default triage queue" ordering so the riskiest records appear first.
+- [ ] Add a compact row schema for cluster type, confidence, actions needed, and suggested outcome.
+- [ ] Design a side-by-side compare panel that highlights only differing fields by default.
+- [ ] Design a merge preview card that summarizes what will be preserved before approval.
+- [ ] Add a mobile drill-in review flow that preserves context when the detail panel takes over the screen.
+- [ ] Validate that the new review flow can handle 1,000+ records without feeling visually noisy.
