@@ -56,9 +56,9 @@
             --shadow-sm: 0 1px 2px rgba(35, 63, 76, 0.08);
             --shadow-md: 0 4px 6px -1px rgba(35, 63, 76, 0.12), 0 2px 4px -1px rgba(35, 63, 76, 0.06);
 
-            --radius-sm: 4px;
-            --radius-md: 6px;
-            --radius-lg: 12px;
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
 
             /* Advanced System Stacks */
             --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -118,10 +118,10 @@
                 radial-gradient(circle at top right, rgba(203, 127, 41, 0.08), transparent 22rem),
                 var(--bg-page);
             color: var(--fg-base);
-            line-height: 1.6;
+            line-height: 1.68;
             padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 3rem;
             min-height: 100vh;
-            font-size: clamp(15px, 0.95rem, 16px);
+            font-size: clamp(16px, 1rem + 0.2vw, 17.5px);
             -webkit-font-smoothing: antialiased;
             font-feature-settings: "cv02", "cv03", "cv04", "cv11";
         }
@@ -193,10 +193,10 @@
             display: flex;
             align-items: flex-start;
             gap: 0.75rem;
-            font-size: clamp(1.875rem, 4vw, 2.5rem);
+            font-size: clamp(2.35rem, 4.75vw, 3.3rem);
             font-weight: 700;
             letter-spacing: -0.035em;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.65rem;
             line-height: 1.15;
         }
 
@@ -208,9 +208,9 @@
 
         .page-title p {
             color: var(--fg-muted);
-            font-size: clamp(1rem, 1.8vw, 1.125rem);
+            font-size: clamp(1.05rem, 1.35vw, 1.2rem);
             font-weight: 400;
-            line-height: 1.6;
+            line-height: 1.65;
             max-width: 42rem;
         }
 
@@ -226,8 +226,8 @@
             gap: 0.75rem;
             box-shadow: var(--shadow-sm);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            font-size: 0.875rem;
-            line-height: 1.45;
+            font-size: 0.95rem;
+            line-height: 1.55;
         }
 
         .privacy-banner svg {
@@ -285,7 +285,7 @@
             width: 100%;
             max-width: 340px;
             padding: 0.875rem 1.5rem;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             background: var(--anchor);
             border-color: var(--anchor);
             color: white;
@@ -317,21 +317,21 @@
         .upload-zone h2 {
             color: var(--anchor);
             margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             font-weight: 700;
         }
 
         .upload-zone p {
             color: rgba(35, 63, 76, 0.8);
             margin-bottom: 1.25rem;
-            font-size: 0.9rem;
+            font-size: 0.98rem;
         }
 
         .btn {
             padding: 0.625rem 1.25rem;
             border: 1px solid transparent;
             border-radius: var(--radius-md);
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all var(--transition);
@@ -378,7 +378,7 @@
 
         .btn-sm {
             padding: 0.4rem 0.875rem;
-            font-size: 0.8125rem;
+            font-size: 0.95rem;
         }
 
         .btn:disabled {
@@ -429,7 +429,7 @@
             align-items: center;
             justify-content: space-between;
             background: var(--bg-surface);
-            padding: 0.75rem 1.25rem;
+            padding: 1rem 1.25rem;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
             margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
@@ -458,7 +458,7 @@
         }
 
         .metric-value {
-            font-size: 1.25rem;
+            font-size: 1.55rem;
             font-weight: 700;
             color: var(--accent);
             line-height: 1.1;
@@ -466,7 +466,7 @@
         }
 
         .metric-label {
-            font-size: 0.7rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: var(--fg-subtle);
             text-transform: uppercase;
@@ -483,7 +483,7 @@
         .status-actions .btn {
             padding: 0.35rem 0.625rem;
             gap: 0.375rem;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             min-height: 2rem;
         }
 
@@ -518,8 +518,47 @@
 
         .no-duplicates h2 {
             margin-bottom: 0.5rem;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
+        }
+
+        .preset-toolbar {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 0.9rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .preset-toolbar label {
+            font-size: 0.92rem;
+            color: var(--fg-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .preset-toolbar select {
+            flex: 1;
+            min-width: 280px;
+            background: var(--bg-page);
+            color: var(--fg-base);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.55rem;
+            font: inherit;
+            line-height: 1.3;
+        }
+
+        .preset-toolbar .preset-hint {
+            width: 100%;
+            color: var(--fg-subtle);
+            font-size: 0.88rem;
+            line-height: 1.5;
         }
 
         /* ===== DUPLICATE CLUSTERS ===== */
@@ -533,7 +572,7 @@
             background: var(--bg-surface);
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            padding: 0.55rem 0.7rem;
+            padding: 0.8rem 0.9rem;
             box-shadow: var(--shadow-sm);
             transition: box-shadow var(--transition);
         }
@@ -553,7 +592,7 @@
         }
 
         .cluster-title {
-            font-size: 0.88rem;
+            font-size: 1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -572,7 +611,7 @@
 
         .match-tags {
             display: flex;
-            gap: 0.18rem;
+            gap: 0.55rem;
             flex-wrap: nowrap;
             align-items: center;
             min-width: 0;
@@ -587,16 +626,23 @@
         .match-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
-            font-size: 0.58rem;
-            padding: 0.1rem 0.35rem;
-            border-radius: var(--radius-sm);
-            background: var(--bg-muted);
-            color: var(--fg-subtle);
-            font-weight: 700;
+            gap: 0.25rem;
+            font-size: 0.82rem;
+            padding: 0;
+            border-radius: 0;
+            background: none;
+            color: var(--fg-muted);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border: 1px solid var(--border);
+            letter-spacing: 0.03em;
+            border: none;
+        }
+
+        .match-tag + .match-tag::before {
+            content: '•';
+            color: var(--fg-ghost);
+            font-weight: 400;
+            margin-right: 0.55rem;
         }
 
         .tag-identity {
@@ -653,13 +699,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 1.5px solid var(--accent);
-            border-radius: 3px;
+            border-radius: 0;
             color: var(--accent);
             font-weight: 900;
-            font-size: 12px;
+            font-size: 0.875rem;
             margin-left: 0.5rem;
             vertical-align: middle;
             background: var(--bg-surface);
@@ -674,9 +720,9 @@
         }
 
         .cluster-actions .btn {
-            padding: 0.15rem 0.35rem;
-            font-size: 0.56rem;
-            min-height: 1.15rem;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.82rem;
+            min-height: 2rem;
         }
 
         .cluster-actions .btn svg {
@@ -701,7 +747,7 @@
             background: var(--bg-muted);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 0.18rem 0.38rem;
+            padding: 0.55rem 0.8rem;
             transition: all var(--transition);
             position: relative;
             display: grid;
@@ -758,7 +804,7 @@
 
         .item-name {
             font-weight: 700;
-            font-size: 0.98rem;
+            font-size: 1.05rem;
             line-height: 1;
             max-width: 100%;
             overflow: hidden;
@@ -770,7 +816,7 @@
 
         .item-card-subtitle {
             color: var(--fg-subtle);
-            font-size: 0.65rem;
+            font-size: 0.82rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             line-height: 1;
@@ -778,14 +824,15 @@
         }
 
         .item-type-badge {
-            font-size: 0.62rem;
-            padding: 1px 5px;
-            border-radius: 3px;
-            background: var(--accent);
-            color: white;
-            font-weight: 700;
+            font-size: 0.84rem;
+            padding: 0;
+            border-radius: 0;
+            background: none;
+            color: var(--fg-muted);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
+            border: none;
         }
 
         .item-delete-checkbox {
@@ -800,11 +847,12 @@
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            padding: 0.1rem 0.3rem;
-            border-radius: 999px;
-            background: rgba(203, 127, 41, 0.08);
-            border: 1px solid rgba(203, 127, 41, 0.16);
+            padding: 0;
+            border-radius: 0;
+            background: none;
+            border: none;
             justify-self: end;
+            color: var(--fg-ghost);
         }
 
         .item-delete-control svg {
@@ -840,12 +888,12 @@
         .item-baseline-count {
             display: inline-flex;
             align-items: center;
-            padding: 0.08rem 0.32rem;
-            border-radius: 999px;
-            background: rgba(203, 127, 41, 0.12);
+            padding: 0;
+            border-radius: 0;
+            background: none;
             color: var(--accent-hover);
-            font-size: 0.58rem;
-            font-weight: 700;
+            font-size: 0.82rem;
+            font-weight: 600;
             line-height: 1;
             white-space: nowrap;
         }
@@ -858,8 +906,8 @@
         }
 
         .item-details {
-            font-size: 0.8125rem;
-            line-height: 1.6;
+            font-size: 0.98rem;
+            line-height: 1.65;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
@@ -874,12 +922,12 @@
         .item-chip-list {
             display: flex;
             align-items: center;
-            gap: 0.18rem;
+            gap: 0.45rem 1rem;
+            flex-wrap: wrap;
             min-width: 0;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            scrollbar-width: none;
+            overflow: visible;
+            white-space: normal;
+            scrollbar-width: auto;
         }
 
         .item-chip-list::-webkit-scrollbar {
@@ -889,63 +937,61 @@
         .item-compact-chip {
             display: inline-flex;
             align-items: center;
-            gap: 0.2rem;
-            padding: 0.09rem 0.28rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--bg-surface);
+            gap: 0.35rem;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            background: none;
             color: var(--fg-base);
-            font-size: 0.66rem;
-            line-height: 1;
+            font-size: 0.92rem;
+            line-height: 1.45;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
         .item-compact-chip .chip-label {
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.62rem;
-            color: var(--fg-subtle);
+            letter-spacing: 0.06em;
+            font-size: 0.8rem;
+            color: var(--fg-muted);
+        }
+
+        .item-compact-chip .chip-separator {
+            color: var(--fg-ghost);
+            font-weight: 500;
         }
 
         .item-compact-chip .chip-value {
-            font-weight: 600;
-            font-size: 0.66rem;
-            max-width: 14rem;
+            font-weight: 500;
+            font-size: 0.92rem;
+            max-width: 18rem;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .item-compact-chip.present {
-            border-color: rgba(10, 142, 132, 0.3);
-            background: rgba(10, 142, 132, 0.08);
+            color: var(--teal-deep);
         }
 
         .item-compact-chip.absent {
-            border-style: dashed;
-            background: rgba(255, 255, 255, 0.45);
             color: var(--fg-ghost);
         }
 
         .item-compact-chip.difference {
-            border-color: rgba(203, 127, 41, 0.4);
-            background: rgba(203, 127, 41, 0.1);
+            color: var(--accent-hover);
         }
 
         .item-compact-chip.unique {
-            border-color: rgba(13, 148, 136, 0.35);
-            background: rgba(13, 148, 136, 0.08);
+            color: var(--teal-mid);
         }
 
         .item-compact-chip.binary {
-            border-color: rgba(59, 130, 246, 0.3);
-            background: rgba(59, 130, 246, 0.08);
+            color: #1d4ed8;
         }
 
         .item-compact-chip.warning {
-            border-color: rgba(220, 38, 38, 0.28);
-            background: rgba(220, 38, 38, 0.08);
+            color: var(--danger);
         }
 
         .item-card-baseline .item-name,
@@ -954,24 +1000,24 @@
         }
 
         .item-card-baseline .item-compact-chip {
-            border-color: rgba(203, 127, 41, 0.2);
+            color: var(--fg-base);
         }
 
         .item-card-baseline .item-compact-chip.present {
-            background: rgba(203, 127, 41, 0.12);
+            color: var(--accent-hover);
         }
 
         .item-card-baseline .item-compact-chip.difference {
-            background: rgba(203, 127, 41, 0.14);
+            color: var(--accent-hover);
         }
 
         .item-diff-row {
             grid-template-columns: 92px 1fr;
             gap: 0.75rem;
             padding: 0.55rem 0.65rem;
-            background: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.25);
             border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm);
+            border-radius: 0;
         }
 
         .item-diff-row .detail-label {
@@ -983,12 +1029,12 @@
         }
 
         .item-diff-empty {
-            padding: 0.7rem 0.8rem;
-            border: 1px dashed var(--border);
-            border-radius: var(--radius-sm);
+            padding: 0.35rem 0;
+            border: none;
+            border-radius: 0;
             color: var(--fg-subtle);
-            background: rgba(255, 255, 255, 0.45);
-            font-size: 0.8rem;
+            background: none;
+            font-size: 0.92rem;
         }
 
         .item-card-footer {
@@ -996,7 +1042,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 0.75rem;
-            font-size: 0.75rem;
+            font-size: 0.92rem;
             color: var(--fg-subtle);
         }
 
@@ -1004,6 +1050,40 @@
         .item-diff-list,
         .item-card-footer {
             display: none;
+        }
+
+        .identical-audit-banner {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--bg-muted);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--teal-mid);
+            border-radius: var(--radius-md);
+            padding: 0.65rem 0.875rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--fg-muted);
+            line-height: 1.5;
+        }
+
+        .identical-audit-banner svg {
+            flex-shrink: 0;
+            color: var(--teal-mid);
+        }
+
+        .identical-audit-banner strong {
+            color: var(--fg-base);
+            font-weight: 600;
+        }
+
+        .item-full-report {
+            margin-top: 0.65rem;
+            padding-top: 0.65rem;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
         }
 
         .item-card-compact-title {
@@ -1028,11 +1108,11 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 999px;
-            background: var(--accent-subtle);
+            padding: 0;
+            border-radius: 0;
+            background: none;
             color: var(--accent-hover);
-            border: 1px solid rgba(203, 127, 41, 0.25);
+            border: none;
             font-weight: 600;
         }
 
@@ -1046,7 +1126,7 @@
         .detail-label {
             color: var(--fg-ghost);
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.82rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             padding-top: 0.125rem;
@@ -1064,23 +1144,19 @@
         }
 
         .uri-list {
-            list-style: none;
+            list-style: disc;
             margin: 0;
-            padding: 0;
+            padding: 0 0 0 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.2rem;
         }
 
         .uri-list li {
             word-break: break-all;
-            font-size: 0.75rem;
+            font-size: 0.92rem;
             color: var(--fg-muted);
-            padding: 0.4rem 0.6rem;
-            background: var(--bg-subtle);
-            border-radius: var(--radius-sm);
             font-family: var(--font-mono);
-            border: 1px solid var(--border);
             font-feature-settings: "tnum";
         }
 
@@ -1102,11 +1178,11 @@
             border: none;
             color: var(--fg-ghost);
             cursor: pointer;
-            padding: 2px;
+            padding: 0;
             display: flex;
             align-items: center;
             transition: color var(--transition);
-            border-radius: var(--radius-sm);
+            border-radius: 0;
         }
 
         .password-toggle:hover {
@@ -1120,32 +1196,35 @@
 
         .metadata-tags {
             display: flex;
-            gap: 0.35rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .meta-tag {
-            font-size: 0.6rem;
-            font-weight: 700;
-            padding: 0.15rem 0.45rem;
-            border-radius: 3px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            padding: 0;
+            border-radius: 0;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            border: 1px solid transparent;
+            border: none;
             font-feature-settings: "tnum";
+            background: none;
+        }
+
+        .meta-divider {
+            color: var(--fg-ghost);
+            font-weight: 400;
         }
 
         .meta-tag.present {
-            background: var(--accent-subtle);
-            color: var(--accent);
-            border-color: var(--accent);
+            color: var(--teal-deep);
         }
 
         .meta-tag.absent {
-            background: var(--bg-subtle);
             color: var(--fg-ghost);
-            border-color: var(--border);
-            opacity: 0.5;
+            opacity: 0.75;
         }
 
         .completeness-score {
@@ -1183,13 +1262,13 @@
         }
 
         .difference-indicator {
-            background: var(--warning-color);
-            color: #000;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
+            background: none;
+            color: var(--warning-color);
+            padding: 0;
+            border-radius: 0;
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-left: 4px;
+            margin-left: 0.35rem;
         }
 
         /* ===== LOADING SPINNER ===== */
@@ -1268,7 +1347,8 @@
             margin-left: 0;
             padding-left: 1.25rem;
             color: var(--fg-muted);
-            font-size: 0.875rem;
+            font-size: 0.98rem;
+            line-height: 1.6;
         }
 
         .instruction-list li {
@@ -1288,14 +1368,14 @@
         .script-instructions code {
             background: var(--bg-muted);
             padding: 0.125rem 0.375rem;
-            border-radius: 3px;
+            border-radius: 0;
             font-family: var(--font-mono);
-            font-size: 0.8125em;
+            font-size: 0.92em;
             color: var(--accent);
             cursor: pointer;
             transition: all var(--transition);
             position: relative;
-            border: 1px solid transparent;
+            border: none;
         }
 
         .instruction-list code:hover,
@@ -1320,8 +1400,8 @@
             background: var(--fg-base);
             color: white;
             padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+            border-radius: 0;
+            font-size: 0.78rem;
             font-weight: 600;
             opacity: 0;
             pointer-events: none;
@@ -1356,7 +1436,7 @@
             margin-top: 0;
             margin-bottom: 0.25rem;
             color: var(--text-primary);
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             letter-spacing: -0.02em;
         }
@@ -1372,13 +1452,13 @@
             color: var(--text-secondary);
             line-height: 1.4;
             padding-left: 0;
-            font-size: clamp(0.75rem, 1.2vw, 0.8125rem);
+            font-size: clamp(0.92rem, 1vw, 0.98rem);
         }
 
         .warning-box-tight {
             background: var(--bg-muted);
             padding: 0.75rem;
-            border-radius: var(--radius-md);
+            border-radius: 0;
             border: 1px solid var(--warning);
             margin-bottom: 0.5rem;
         }
@@ -1391,12 +1471,12 @@
         kbd {
             background-color: var(--bg-muted);
             border: 1px solid var(--border);
-            border-radius: 3px;
+            border-radius: 0;
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
             color: var(--fg-base);
             display: inline-block;
             font-family: var(--font-mono);
-            font-size: 0.75em;
+            font-size: 0.9em;
             line-height: 1;
             padding: 2px 4px;
             white-space: nowrap;
@@ -1411,7 +1491,7 @@
         }
 
         .footer-disclaimer p {
-            font-size: 0.74rem;
+            font-size: 0.92rem;
             color: var(--fg-ghost);
             line-height: 1.65;
             max-width: 64rem;
@@ -1428,8 +1508,8 @@
 
         .instructions p {
             color: var(--text-secondary);
-            line-height: 1.4;
-            font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+            line-height: 1.55;
+            font-size: clamp(0.95rem, 1vw, 1rem);
         }
 
         /* ===== CLI SCRIPT MODAL ===== */
@@ -1473,7 +1553,7 @@
         .modal-header h3 {
             margin: 0;
             color: var(--fg-base);
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
         }
 
@@ -1520,7 +1600,7 @@
             background: var(--bg-surface);
             color: var(--fg-base);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 0;
             padding: 0.7rem 0.8rem;
             font: inherit;
         }
@@ -1533,7 +1613,7 @@
 
         .merge-field-hint {
             color: var(--fg-ghost);
-            font-size: 0.75rem;
+            font-size: 0.92rem;
             line-height: 1.4;
         }
 
@@ -1553,6 +1633,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all var(--transition);
+            font-size: 0.95rem;
         }
 
         .script-tab.active {
@@ -1571,7 +1652,7 @@
         .script-box {
             background: var(--bg-muted);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: 0;
             padding: 1rem;
             margin-bottom: 1rem;
             position: relative;
@@ -1581,11 +1662,11 @@
             width: 100%;
             min-height: 300px;
             font-family: var(--font-mono);
-            font-size: 0.8125rem;
+            font-size: 0.95rem;
             background: var(--bg-subtle);
             color: var(--fg-base);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 0;
             padding: 0.75rem;
             line-height: 1.5;
             resize: vertical;
@@ -1599,8 +1680,8 @@
             background: var(--accent);
             color: white;
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.8125rem;
+            border-radius: 0;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all var(--transition);
@@ -1619,12 +1700,12 @@
             border-left: 3px solid var(--accent);
             padding: 1rem;
             margin-bottom: 1rem;
-            border-radius: var(--radius-sm);
+            border-radius: 0;
         }
 
         .script-instructions h4 {
             margin: 0 0 0.5rem 0;
-            font-size: 0.9375rem;
+            font-size: 1.05rem;
             color: var(--fg-base);
         }
 
@@ -1635,7 +1716,7 @@
 
         .script-instructions li {
             margin-bottom: 0.375rem;
-            font-size: 0.875rem;
+            font-size: 0.98rem;
             color: var(--fg-muted);
             line-height: 1.5;
         }
@@ -1643,9 +1724,9 @@
         .script-instructions code {
             background: var(--bg-muted);
             padding: 0.125rem 0.375rem;
-            border-radius: 3px;
+            border-radius: 0;
             font-family: var(--font-mono);
-            font-size: 0.8125em;
+            font-size: 0.92em;
             color: var(--accent);
         }
 
@@ -1659,7 +1740,16 @@
 
         @media (max-width: 768px) {
             body {
-                padding: 12px;
+                padding: 14px;
+            }
+
+            .preset-toolbar {
+                align-items: stretch;
+            }
+
+            .preset-toolbar label,
+            .preset-toolbar select {
+                width: 100%;
             }
 
             .hero-header {
@@ -1672,7 +1762,7 @@
             }
 
             .header h1 {
-                font-size: 22px;
+                font-size: 26px;
             }
 
             .items-grid {
@@ -1800,9 +1890,9 @@
                     Proton Pass).
                 </p>
                 <div class="warning-box-tight">
-                    <p style="color: var(--warning); font-weight: 600; font-size: 0.75rem; margin-bottom: 0.25rem;">⚠️
+                    <p style="color: var(--warning); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem;">⚠️
                         Warning:</p>
-                    <p style="color: var(--fg-muted); font-size: 0.7rem; margin: 0;">Importing JSON into a populated
+                    <p style="color: var(--fg-muted); font-size: 0.92rem; margin: 0;">Importing JSON into a populated
                         Bitwarden vault could create massive duplication of data and may require extensive manual
                         cleanup.
                         Only do so at your own risk.</p>
@@ -1952,6 +2042,18 @@
                 </div>
             </div>
 
+            <div class="preset-toolbar hidden" id="clusterPresetToolbar">
+                <label for="clusterPresetSelect">View + Auto-select Preset</label>
+                <select id="clusterPresetSelect" aria-label="Preset view and selection mode">
+                    <option value="all">All Matches - recommended auto-selection</option>
+                    <option value="exact100">100% Match - identical records</option>
+                    <option value="high75">75%+ Match - likely duplicates</option>
+                    <option value="mid50">50-74% Match - review needed</option>
+                    <option value="conflicts">Conflicts Only - password mismatch</option>
+                </select>
+                <p class="preset-hint" id="clusterPresetHint">Filters the visible list and applies the preset selection strategy.</p>
+            </div>
+
             <!-- No Duplicates Message -->
             <div class="no-duplicates hidden" id="noDuplicatesMsg">
                 <h2>✓ No Duplicates Found!</h2>
@@ -1977,7 +2079,7 @@
                     <button class="modal-close" onclick="closeMergeModal()">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p style="font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 1.5rem;">
+                    <p style="font-size: 0.98rem; color: var(--fg-muted); margin-bottom: 1.5rem;">
                         This will create a new <strong>Union Record</strong> containing all unique data from this
                         cluster.
                         The original items will be marked for deletion.
@@ -2071,7 +2173,40 @@
         let items = [];
         let duplicateClusters = [];
         let itemsToDelete = new Set();
+        let activeClusterPreset = 'all';
         const THEME_STORAGE_KEY = 'nexo-theme';
+        const CLUSTER_PRESETS = {
+            all: {
+                label: 'All Matches - recommended auto-selection',
+                hint: 'Shows every cluster and reapplies the standard recommendation logic.',
+                filter: () => true,
+                selectionMode: 'recommended'
+            },
+            exact100: {
+                label: '100% Match - identical records',
+                hint: 'Shows only perfect identity matches and keeps the strongest single record in each visible cluster.',
+                filter: (cluster) => cluster.matchScore === 100,
+                selectionMode: 'keepOne'
+            },
+            high75: {
+                label: '75%+ Match - likely duplicates',
+                hint: 'Shows high-confidence matches and applies recommendation logic only to those visible clusters.',
+                filter: (cluster) => cluster.matchScore >= 75 && !cluster.hasConflict,
+                selectionMode: 'recommended'
+            },
+            mid50: {
+                label: '50-74% Match - review needed',
+                hint: 'Shows medium-confidence matches and leaves all selections manual.',
+                filter: (cluster) => cluster.matchScore >= 50 && cluster.matchScore < 75,
+                selectionMode: 'none'
+            },
+            conflicts: {
+                label: 'Conflicts Only - password mismatch',
+                hint: 'Shows password conflicts only. Auto-selection stays off for safety.',
+                filter: (cluster) => cluster.hasConflict,
+                selectionMode: 'none'
+            }
+        };
 
         // ===== APPLICATION BOOTSTRAP =====
         document.addEventListener('DOMContentLoaded', initializeApp);
@@ -2117,6 +2252,91 @@
             }
         }
 
+        function getActiveClusterPresetDefinition() {
+            return CLUSTER_PRESETS[activeClusterPreset] || CLUSTER_PRESETS.all;
+        }
+
+        function getVisibleClusterEntries() {
+            const preset = getActiveClusterPresetDefinition();
+            return duplicateClusters
+                .map((cluster, index) => ({ cluster, index }))
+                .filter(entry => preset.filter(entry.cluster));
+        }
+
+        function getBestKeepCandidate(cluster) {
+            return [...cluster.items].sort((a, b) => {
+                const scoreA = calculateCompleteness(a) + (a.favorite ? 10 : 0) + (a.hasPasswordHistory ? 5 : 0);
+                const scoreB = calculateCompleteness(b) + (b.favorite ? 10 : 0) + (b.hasPasswordHistory ? 5 : 0);
+
+                if (scoreA !== scoreB) {
+                    return scoreB - scoreA;
+                }
+
+                return new Date(b.revisionDate) - new Date(a.revisionDate);
+            })[0];
+        }
+
+        function applyPresetSelections() {
+            const preset = getActiveClusterPresetDefinition();
+            const visibleEntries = getVisibleClusterEntries();
+
+            itemsToDelete.clear();
+
+            if (preset.selectionMode === 'none') {
+                return;
+            }
+
+            if (preset.selectionMode === 'recommended') {
+                visibleEntries.forEach(({ cluster }) => {
+                    rankAndSuggest(cluster);
+                });
+                return;
+            }
+
+            if (preset.selectionMode === 'keepOne') {
+                visibleEntries.forEach(({ cluster }) => {
+                    if (cluster.hasConflict) return;
+
+                    const keepItem = getBestKeepCandidate(cluster);
+                    cluster.items.forEach(item => {
+                        if (item.id !== keepItem.id) {
+                            itemsToDelete.add(item.id);
+                        }
+                    });
+                });
+            }
+        }
+
+        function updatePresetHint() {
+            const preset = getActiveClusterPresetDefinition();
+            const hint = document.getElementById('clusterPresetHint');
+            const select = document.getElementById('clusterPresetSelect');
+
+            if (select) {
+                select.value = activeClusterPreset;
+            }
+
+            if (hint) {
+                hint.textContent = preset.hint;
+            }
+        }
+
+        function applyClusterPreset(presetId, shouldApplySelections = true) {
+            if (!Object.prototype.hasOwnProperty.call(CLUSTER_PRESETS, presetId)) {
+                presetId = 'all';
+            }
+
+            activeClusterPreset = presetId;
+            updatePresetHint();
+
+            if (shouldApplySelections) {
+                applyPresetSelections();
+            }
+
+            renderClusters();
+            updateStats();
+        }
+
         /**
          * Setup scroll listener for 'Back to Top' button
          */
@@ -2148,6 +2368,7 @@
         function setupEventListeners() {
             const uploadZone = document.getElementById('uploadZone');
             const fileInput = document.getElementById('fileInput');
+            const presetSelect = document.getElementById('clusterPresetSelect');
 
             // File input change
             fileInput.addEventListener('change', (e) => {
@@ -2202,6 +2423,12 @@
                     closeMergeModal();
                 }
             });
+
+            if (presetSelect) {
+                presetSelect.addEventListener('change', (e) => {
+                    applyClusterPreset(e.target.value, true);
+                });
+            }
         }
 
         /**
@@ -2303,9 +2530,8 @@
                 // Find duplicates
                 duplicateClusters = findDuplicates(items);
 
-                // Render results
-                renderClusters();
-                updateStats();
+                activeClusterPreset = 'all';
+                applyClusterPreset(activeClusterPreset, true);
                 scrollToResults();
 
                 showLoading(false);
@@ -3019,9 +3245,11 @@
                         <div class="item-detail">
                             <span class="detail-label">Security:</span>
                             <div class="metadata-tags">
-                                <span class="meta-tag ${synthesized.hasPassword ? 'present' : 'absent'}">Pass</span>
-                                <span class="meta-tag ${synthesized.hasTOTP ? 'present' : 'absent'}">TOTP</span>
-                                <span class="meta-tag ${synthesized.hasFido2 ? 'present' : 'absent'}">FIDO2</span>
+                                <span class="meta-tag ${synthesized.hasPassword ? 'present' : 'absent'}">Password: ${synthesized.hasPassword ? 'present' : 'missing'}</span>
+                                <span class="meta-divider" aria-hidden="true">|</span>
+                                <span class="meta-tag ${synthesized.hasTOTP ? 'present' : 'absent'}">TOTP: ${synthesized.hasTOTP ? 'present' : 'missing'}</span>
+                                <span class="meta-divider" aria-hidden="true">|</span>
+                                <span class="meta-tag ${synthesized.hasFido2 ? 'present' : 'absent'}">FIDO2: ${synthesized.hasFido2 ? 'present' : 'missing'}</span>
                             </div>
                         </div>
                         <div class="item-detail">
@@ -3155,15 +3383,19 @@
             const container = document.getElementById('clustersContainer');
             container.innerHTML = '';
 
-            duplicateClusters.forEach((cluster, clusterIndex) => {
+            const visibleEntries = getVisibleClusterEntries();
+
+            visibleEntries.forEach(({ cluster, index: clusterIndex }, visibleIndex) => {
                 const clusterDiv = document.createElement('div');
                 clusterDiv.className = 'cluster';
+
+                const isIdenticalCluster = cluster.matchScore === 100;
 
                 clusterDiv.innerHTML = `
                     <div class="cluster-header">
                         <div>
                             <div class="cluster-title">
-                                Cluster ${clusterIndex + 1}
+                                Cluster ${visibleIndex + 1}
                                 <div class="match-tags">
                                     ${cluster.matchTags.map(renderMatchTag).join('')}
                                 </div>
@@ -3179,6 +3411,15 @@
                             <button class="btn btn-secondary btn-sm" onclick="selectAllInCluster(${clusterIndex})">Select All</button>
                         </div>
                     </div>
+                    ${isIdenticalCluster ? `
+                        <div class="identical-audit-banner">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span><strong>Identical Credentials — Full Record Audit</strong> · All credential fields match. The full record details for each copy are shown below to help you identify which to keep.</span>
+                        </div>
+                    ` : ''}
                     <div class="items-grid">
                         ${cluster.items.map((item, itemIndex) => renderItemCard(item, clusterIndex, itemIndex, cluster)).join('')}
                     </div>
@@ -3196,7 +3437,7 @@
         function buildCompactChip(label, value, chipClass, titleText) {
             const safeValue = value === '' ? '<span class="detail-value-muted">(none)</span>' : escapeHtml(value);
             const title = titleText ? ` title="${escapeAttribute(titleText)}"` : '';
-            return `<span class="item-compact-chip ${chipClass || ''}"${title}><span class="chip-label">${escapeHtml(label)}</span><span class="chip-value">${safeValue}</span></span>`;
+            return `<span class="item-compact-chip ${chipClass || ''}"${title}><span class="chip-label">${escapeHtml(label)}</span><span class="chip-separator" aria-hidden="true">|</span><span class="chip-value">${safeValue}</span></span>`;
         }
 
         function buildItemComparisonChips(item, cluster, showAllFields = false) {
@@ -3291,6 +3532,95 @@
             return buildItemComparisonChips(item, cluster, true).length;
         }
 
+        function renderReportRow(label, valueHtml) {
+            return `
+                <div class="item-detail">
+                    <div class="detail-label">${escapeHtml(label)}</div>
+                    <div class="detail-value">${valueHtml}</div>
+                </div>
+            `;
+        }
+
+        function renderOptionalText(value, fallback = '(none)') {
+            const raw = String(value ?? '').trim();
+            if (!raw) {
+                return `<span class="detail-value-muted">${escapeHtml(fallback)}</span>`;
+            }
+
+            return escapeHtml(raw);
+        }
+
+        function renderDateOrFallback(dateStr) {
+            if (!dateStr) {
+                return '<span class="detail-value-muted">(unknown)</span>';
+            }
+
+            return escapeHtml(formatDate(dateStr));
+        }
+
+        function renderUrisForReport(uris) {
+            if (!Array.isArray(uris) || uris.length === 0) {
+                return '<span class="detail-value-muted">(none)</span>';
+            }
+
+            return `<ul class="uri-list">${uris.map(uri => `<li>${escapeHtml(uri)}</li>`).join('')}</ul>`;
+        }
+
+        function renderMultilineText(value) {
+            const raw = String(value ?? '').trim();
+            if (!raw) {
+                return '<span class="detail-value-muted">(none)</span>';
+            }
+
+            return escapeHtml(raw).replace(/\n/g, '<br>');
+        }
+
+        function buildFullItemReport(item) {
+            const rows = [];
+
+            const pushRow = (label, valueHtml) => {
+                rows.push(renderReportRow(label, valueHtml));
+            };
+
+            pushRow('Created', renderDateOrFallback(item.creationDate));
+            pushRow('Last Edited', renderDateOrFallback(item.revisionDate));
+            pushRow('Folder', renderOptionalText(getFolderName(item.folderId)));
+            pushRow('Favorite', item.favorite ? 'Yes' : 'No');
+            pushRow('Password History', item.hasPasswordHistory ? `${item.passwordHistoryCount} entries` : 'No');
+            pushRow('Custom Fields', item.hasCustomFields ? `${item.customFieldsCount} fields` : 'No');
+
+            if (item.type === 1) {
+                pushRow('Username', renderOptionalText(item.username));
+                pushRow('URIs', renderUrisForReport(item.uris));
+                pushRow('Password', item.hasPassword ? escapeHtml(item.maskedPassword || '(present)') : '<span class="detail-value-muted">(none)</span>');
+                pushRow('TOTP', item.hasTOTP ? 'Enabled' : 'Disabled');
+                pushRow('FIDO2', item.hasFido2 ? `${item.fido2Credentials.length} credential(s)` : 'None');
+            }
+
+            if (item.type === 3) {
+                const card = item.card || {};
+                const last4 = card.number ? `•••• ${String(card.number).slice(-4)}` : '(none)';
+                pushRow('Card Number', escapeHtml(last4));
+                pushRow('Card Brand', renderOptionalText(card.brand));
+                pushRow('Expiration', renderOptionalText(card.expMonth && card.expYear ? `${card.expMonth}/${card.expYear}` : ''));
+            }
+
+            if (item.type === 4) {
+                const identity = item.identity || {};
+                pushRow('First Name', renderOptionalText(identity.firstName));
+                pushRow('Last Name', renderOptionalText(identity.lastName));
+                pushRow('Email', renderOptionalText(identity.email));
+                pushRow('Identity Username', renderOptionalText(identity.username));
+            }
+
+            pushRow('Notes', renderMultilineText(item.notes));
+
+            return {
+                html: rows.join(''),
+                count: rows.length
+            };
+        }
+
         /**
          * Render individual item card
          * @param {Object} item - Item data
@@ -3302,10 +3632,14 @@
             const typeName = getTypeName(item.type);
             const isMarked = itemsToDelete.has(item.id);
             const isBaselineItem = itemIndex === 0;
-            const differenceChips = isBaselineItem
-                ? buildItemComparisonChips(item, cluster, true)
-                : buildItemComparisonChips(item, cluster, false);
-            const baselineSummaryCount = isBaselineItem ? getBaselineSummaryCount(item, cluster) : 0;
+            const showFullReport = cluster.matchScore === 100;
+            const fullReport = showFullReport ? buildFullItemReport(item) : null;
+            const differenceChips = showFullReport
+                ? []
+                : (isBaselineItem ? buildItemComparisonChips(item, cluster, true) : buildItemComparisonChips(item, cluster, false));
+            const baselineSummaryCount = showFullReport
+                ? fullReport.count
+                : (isBaselineItem ? getBaselineSummaryCount(item, cluster) : 0);
 
             return `
                 <div class="item-card ${isBaselineItem ? 'item-card-baseline item-card-baseline-expanded' : ''} ${isMarked ? 'marked-delete' : ''}" id="item-${item.id}">
@@ -3323,14 +3657,20 @@
                                 <span class="item-name">${escapeHtml(item.name)}</span>
                             </div>
                             <span class="item-type-badge">${escapeHtml(typeName)}</span>
-                            <span class="item-card-subtitle">${isBaselineItem ? 'Baseline' : 'Diff'}</span>
-                            ${isBaselineItem ? `<span class="item-baseline-count">${baselineSummaryCount} fields</span>` : ''}
+                            <span class="item-card-subtitle">${showFullReport ? 'Report' : (isBaselineItem ? 'Baseline' : 'Diff')}</span>
+                            ${showFullReport || isBaselineItem ? `<span class="item-baseline-count">${baselineSummaryCount} fields</span>` : ''}
                         </div>
                     </div>
 
-                    <div class="item-chip-list ${isBaselineItem ? 'item-baseline-expanded-list' : ''}">
-                        ${differenceChips.length > 0 ? differenceChips.join('') : '<span class="item-compact-chip present"><span class="chip-label">Match</span><span class="chip-value">no differences</span></span>'}
-                    </div>
+                    ${showFullReport ? `
+                        <div class="item-full-report">
+                            ${fullReport.html}
+                        </div>
+                    ` : `
+                        <div class="item-chip-list ${isBaselineItem ? 'item-baseline-expanded-list' : ''}">
+                            ${differenceChips.length > 0 ? differenceChips.join('') : '<span class="item-compact-chip present"><span class="chip-label">Match</span><span class="chip-value">no differences</span></span>'}
+                        </div>
+                    `}
 
                     <div class="item-delete-control">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -3427,10 +3767,7 @@
          * Reset selections to the initial automatic recommendations
          */
         function selectRecommended() {
-            itemsToDelete.clear();
-            duplicateClusters.forEach(cluster => {
-                rankAndSuggest(cluster);
-            });
+            applyPresetSelections();
             renderClusters();
             updateStats();
         }
@@ -3489,8 +3826,10 @@
          * Update statistics display
          */
         function updateStats() {
+            const visibleClusters = getVisibleClusterEntries().length;
+
             document.getElementById('totalItems').textContent = items.length;
-            document.getElementById('duplicateClusters').textContent = duplicateClusters.length;
+            document.getElementById('duplicateClusters').textContent = visibleClusters;
             document.getElementById('markedForDeletion').textContent = itemsToDelete.size;
             document.getElementById('mergeCandidates').textContent = getTargetedMergeCount();
 
@@ -3498,8 +3837,19 @@
             document.getElementById('exportGuide').classList.add('hidden');
             document.getElementById('gettingStarted').classList.add('hidden');
             document.getElementById('resultsSection').classList.add('show');
+            document.getElementById('clusterPresetToolbar').classList.remove('hidden');
+
+            const noDuplicatesTitle = document.querySelector('#noDuplicatesMsg h2');
+            const noDuplicatesBody = document.querySelector('#noDuplicatesMsg p');
 
             if (duplicateClusters.length === 0) {
+                noDuplicatesTitle.textContent = '✓ No Duplicates Found!';
+                noDuplicatesBody.textContent = 'Your Bitwarden vault is clean.';
+                document.getElementById('noDuplicatesMsg').classList.remove('hidden');
+                document.getElementById('clustersContainer').classList.add('hidden');
+            } else if (visibleClusters === 0) {
+                noDuplicatesTitle.textContent = 'No Clusters Match This Preset';
+                noDuplicatesBody.textContent = 'Try a different preset from the drop-down to view more duplicates.';
                 document.getElementById('noDuplicatesMsg').classList.remove('hidden');
                 document.getElementById('clustersContainer').classList.add('hidden');
             } else {
@@ -4030,9 +4380,12 @@
 
             originalData = null;
             resetAnalysisState();
+            activeClusterPreset = 'all';
+            updatePresetHint();
 
             // Reset UI
             document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('clusterPresetToolbar').classList.add('hidden');
             document.getElementById('exportGuide').classList.remove('hidden');
             document.getElementById('gettingStarted').classList.remove('hidden');
             document.getElementById('fileInput').value = '';
