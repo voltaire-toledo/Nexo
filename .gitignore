@@ -17,13 +17,10 @@ Thumbs.db
 # Vault import/export artifacts
 # This repo should not contain real Bitwarden or password-manager data.
 /*.json
-!/package.json
-!/package-lock.json
-!/tsconfig.json
-!/jsconfig.json
-!/deno.json
-!/deno.jsonc
-!/composer.json
+
+# Exclude all HTML files that doesn't start with Nexo
+!Nexo*.html
+
 
 /*.csv
 /*.tsv
