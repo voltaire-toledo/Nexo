@@ -9,8 +9,6 @@
   <img src="assets/home-split.png" alt="Dark and Light Mode support" width="600" />
 </p>
 
-<p align="center"><sub>Demo prepared with <a href="https://tight.studio/">Tight Studio</a></sub></p>
-
 > Find duplicates. Merge what matters. Bring order to your Bitwarden Vault.
 
 A secure, offline-first utility for analyzing duplicate entries in Bitwarden vault exports.
