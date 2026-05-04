@@ -30,3 +30,6 @@ Thumbs.db
 /*.1pux
 /*.kdbx
 /*.kdbxx
+
+# Syncthing
+**/~syncthing~*
