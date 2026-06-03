@@ -191,7 +191,7 @@
         .page-title h1 {
             color: var(--fg-base);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.75rem;
             font-size: clamp(2.35rem, 4.75vw, 3.3rem);
             font-weight: 700;
@@ -566,6 +566,7 @@
             display: flex;
             flex-direction: column;
             gap: 2.5rem;
+            contain: layout paint;
         }
 
         .cluster {
@@ -575,6 +576,18 @@
             padding: 0.8rem 0.9rem;
             box-shadow: var(--shadow-sm);
             transition: box-shadow var(--transition);
+            content-visibility: auto;
+            contain-intrinsic-size: 360px;
+        }
+
+        .cluster.merge-available {
+            background: #f4faf9;
+            border-color: var(--teal-light);
+        }
+
+        :root[data-theme="dark"] .cluster.merge-available {
+            background: #1e3540;
+            border-color: var(--teal-deep);
         }
 
         .cluster:hover {
@@ -715,7 +728,7 @@
         .cluster-actions {
             display: flex;
             gap: 0.25rem;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             align-items: center;
         }
 
@@ -748,13 +761,13 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 0.55rem 0.8rem;
-            transition: all var(--transition);
+            transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
             position: relative;
-            display: grid;
-            grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 0.4rem 0.6rem;
-            min-height: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            min-height: 26px;
+            contain: layout paint style;
         }
 
         .item-card:hover {
@@ -771,7 +784,6 @@
         .item-card-baseline {
             background: linear-gradient(90deg, rgba(203, 127, 41, 0.08), rgba(255, 255, 255, 0.35));
             border-color: rgba(203, 127, 41, 0.4);
-            grid-template-columns: minmax(260px, 1.8fr) minmax(0, 1fr) auto;
         }
 
         .item-card-baseline-expanded {
@@ -805,11 +817,11 @@
         .item-name {
             font-weight: 700;
             font-size: 1.05rem;
-            line-height: 1;
+            line-height: 1.2;
             max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            overflow: visible;
+            white-space: normal;
+            word-break: break-word;
             color: var(--fg-base);
             letter-spacing: -0.01em;
         }
@@ -821,18 +833,6 @@
             letter-spacing: 0.08em;
             line-height: 1;
             white-space: nowrap;
-        }
-
-        .item-type-badge {
-            font-size: 0.84rem;
-            padding: 0;
-            border-radius: 0;
-            background: none;
-            color: var(--fg-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            border: none;
         }
 
         .item-delete-checkbox {
@@ -872,10 +872,67 @@
 
         .item-name-wrap {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.4rem;
+            flex-wrap: wrap;
             min-width: 0;
             flex: 1;
+        }
+
+        .item-name-meta-inline {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.3rem;
+        }
+
+        .item-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .item-meta-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.22rem;
+        }
+
+        .item-expand-toggle {
+            width: 16px;
+            height: 16px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            background: transparent;
+            color: var(--fg-subtle);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .item-expand-toggle:hover {
+            border-color: var(--border);
+            color: var(--accent-hover);
+            background: rgba(203, 127, 41, 0.08);
+        }
+
+        .item-expand-toggle:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .item-expand-glyph {
+            font-size: 0.68rem;
+            line-height: 1;
+            transform: translateX(0);
+        }
+
+        .item-expand-toggle.expanded .item-expand-glyph {
+            transform: rotate(90deg);
         }
 
         .item-delete-checkbox-inline {
@@ -1077,31 +1134,24 @@
             font-weight: 600;
         }
 
-        .item-full-report {
-            margin-top: 0.65rem;
-            padding-top: 0.65rem;
-            border-top: 1px solid var(--border-subtle);
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-        }
-
         .item-card-compact-title {
             display: flex;
-            align-items: center;
-            gap: 0.35rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.18rem;
             min-width: 0;
-            white-space: nowrap;
-            overflow: hidden;
+            white-space: normal;
+            overflow: visible;
             flex: 1;
         }
 
         .item-card-compact-main {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            justify-content: space-between;
             gap: 0.35rem;
             min-width: 0;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .item-diff-badge {
@@ -1121,6 +1171,74 @@
             grid-template-columns: 100px 1fr;
             gap: 1rem;
             align-items: start;
+        }
+
+        .item-compact-report {
+            grid-column: 1 / -1;
+            margin-top: 0.15rem;
+            padding-top: 0.35rem;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            font-size: 0.7rem;
+            line-height: 1.25;
+        }
+
+        .item-report-line {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.4rem;
+        }
+
+        .detail-pair {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.05rem 0.22rem;
+            border-radius: 3px;
+            border: 1px solid transparent;
+        }
+
+        .detail-pair-label {
+            font-size: 0.69rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--fg-subtle);
+        }
+
+        .detail-pair-value {
+            font-size: 0.7rem;
+            color: var(--fg-base);
+            font-weight: 600;
+        }
+
+        .detail-pair.diff {
+            background: rgba(203, 127, 41, 0.15);
+            border-color: rgba(203, 127, 41, 0.4);
+        }
+
+        .detail-pair.diff .detail-pair-label,
+        .detail-pair.diff .detail-pair-value {
+            color: var(--accent-hover);
+            font-weight: 700;
+        }
+
+        .detail-status {
+            font-weight: 700;
+            font-size: 0.72rem;
+            line-height: 1;
+        }
+
+        .detail-status.status-yes {
+            color: var(--fg-base);
+        }
+
+        .detail-status.status-no {
+            color: var(--fg-ghost);
+            opacity: 0.6;
         }
 
         .detail-label {
@@ -1301,6 +1419,17 @@
         @keyframes spin {
             to {
                 transform: rotate(360deg);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
             }
         }
 
@@ -2173,7 +2302,10 @@
         let items = [];
         let duplicateClusters = [];
         let itemsToDelete = new Set();
+        let expandedItemDetails = new Set();
+        let clusterRenderToken = 0;
         let activeClusterPreset = 'all';
+        const CLUSTER_RENDER_BATCH_SIZE = 32;
         const THEME_STORAGE_KEY = 'nexo-theme';
         const CLUSTER_PRESETS = {
             all: {
@@ -2226,6 +2358,7 @@
             items = [];
             duplicateClusters = [];
             itemsToDelete = new Set();
+            expandedItemDetails = new Set();
         }
 
         /**
@@ -2246,9 +2379,68 @@
 
             card.classList.toggle('marked-delete', isMarked);
 
-            const checkbox = card.querySelector('.item-delete-checkbox');
+            const checkbox = card.querySelector('.item-delete-checkbox-inline, .item-delete-checkbox');
             if (checkbox) {
                 checkbox.checked = isMarked;
+            }
+        }
+
+        /**
+         * Toggle compact item details for a specific record card.
+         * @param {string} itemId - Item UUID
+         */
+        function toggleItemDetails(itemId) {
+            if (expandedItemDetails.has(itemId)) {
+                expandedItemDetails.delete(itemId);
+            } else {
+                expandedItemDetails.add(itemId);
+            }
+
+            const card = document.getElementById(`item-${itemId}`);
+            if (!card) {
+                renderClusters();
+                return;
+            }
+
+            let targetCluster = null;
+            let targetItem = null;
+
+            for (const cluster of duplicateClusters) {
+                const match = cluster.items.find(item => item.id === itemId);
+                if (match) {
+                    targetCluster = cluster;
+                    targetItem = match;
+                    break;
+                }
+            }
+
+            if (!targetCluster || !targetItem) {
+                renderClusters();
+                return;
+            }
+
+            const isExpanded = expandedItemDetails.has(itemId);
+            const toggle = card.querySelector('.item-expand-toggle');
+            if (toggle) {
+                toggle.classList.toggle('expanded', isExpanded);
+                toggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                toggle.setAttribute('title', isExpanded ? 'Collapse details' : 'Expand details');
+            }
+
+            const detailsId = `item-details-${itemId}`;
+            const existingDetails = card.querySelector(`#${detailsId}`);
+
+            if (isExpanded) {
+                if (!existingDetails) {
+                    const baselineItem = getBestKeepCandidate(targetCluster);
+                    const details = document.createElement('div');
+                    details.className = 'item-compact-report';
+                    details.id = detailsId;
+                    details.innerHTML = buildCompactItemDetails(targetItem, baselineItem);
+                    card.appendChild(details);
+                }
+            } else if (existingDetails) {
+                existingDetails.remove();
             }
         }
 
@@ -3381,51 +3573,106 @@
          */
         function renderClusters() {
             const container = document.getElementById('clustersContainer');
+            const renderToken = ++clusterRenderToken;
             container.innerHTML = '';
+            container.setAttribute('aria-busy', 'true');
 
             const visibleEntries = getVisibleClusterEntries();
 
-            visibleEntries.forEach(({ cluster, index: clusterIndex }, visibleIndex) => {
-                const clusterDiv = document.createElement('div');
-                clusterDiv.className = 'cluster';
+            if (visibleEntries.length === 0) {
+                container.removeAttribute('aria-busy');
+                return;
+            }
 
-                const isIdenticalCluster = cluster.matchScore === 100;
+            let cursor = 0;
 
-                clusterDiv.innerHTML = `
-                    <div class="cluster-header">
-                        <div>
-                            <div class="cluster-title">
-                                Cluster ${visibleIndex + 1}
-                                <div class="match-tags">
-                                    ${cluster.matchTags.map(renderMatchTag).join('')}
-                                </div>
+            const renderBatch = () => {
+                if (renderToken !== clusterRenderToken) {
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+                const batchEnd = Math.min(cursor + CLUSTER_RENDER_BATCH_SIZE, visibleEntries.length);
+
+                for (; cursor < batchEnd; cursor++) {
+                    const { cluster, index: clusterIndex } = visibleEntries[cursor];
+                    fragment.appendChild(buildClusterCard(cluster, clusterIndex, cursor));
+                }
+
+                container.appendChild(fragment);
+
+                if (cursor < visibleEntries.length) {
+                    setTimeout(renderBatch, 0);
+                } else {
+                    container.removeAttribute('aria-busy');
+                }
+            };
+
+            setTimeout(renderBatch, 0);
+        }
+
+        function buildClusterCard(cluster, clusterIndex, visibleIndex) {
+            const clusterDiv = document.createElement('div');
+            clusterDiv.className = 'cluster';
+            if (cluster.mergeCandidate && !cluster.hasConflict) {
+                clusterDiv.classList.add('merge-available');
+            }
+            const displayItems = getClusterDisplayItems(cluster);
+            const baselineItem = displayItems[0] || null;
+
+            const isIdenticalCluster = cluster.matchScore === 100;
+
+            clusterDiv.innerHTML = `
+                <div class="cluster-header">
+                    <div>
+                        <div class="cluster-title">
+                            Cluster ${visibleIndex + 1}
+                            <div class="match-tags">
+                                ${cluster.matchTags.map(renderMatchTag).join('')}
                             </div>
                         </div>
-                        <div class="cluster-actions">
-                            ${cluster.mergeCandidate && !cluster.hasConflict ? `
-                                <button class="btn btn-primary btn-sm" onclick="previewMerge(${clusterIndex})" style="background: var(--teal-mid);">
-                                    ${cluster.targetedMergeId ? 'Edit Merge' : 'Review & Merge'}
-                                </button>
-                            ` : ''}
-                            <button class="btn btn-secondary btn-sm" onclick="keepNewestInCluster(${clusterIndex})">Keep Newest</button>
-                            <button class="btn btn-secondary btn-sm" onclick="selectAllInCluster(${clusterIndex})">Select All</button>
-                        </div>
                     </div>
-                    ${isIdenticalCluster ? `
-                        <div class="identical-audit-banner">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                            <span><strong>Identical Credentials — Full Record Audit</strong> · All credential fields match. The full record details for each copy are shown below to help you identify which to keep.</span>
-                        </div>
-                    ` : ''}
-                    <div class="items-grid">
-                        ${cluster.items.map((item, itemIndex) => renderItemCard(item, clusterIndex, itemIndex, cluster)).join('')}
+                    <div class="cluster-actions">
+                        ${cluster.mergeCandidate && !cluster.hasConflict ? `
+                            <button class="btn btn-primary btn-sm" onclick="previewMerge(${clusterIndex})" style="background: var(--teal-mid);">
+                                ${cluster.targetedMergeId ? 'Edit Merge' : 'Review & Merge'}
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-secondary btn-sm" onclick="selectAllInCluster(${clusterIndex})">Select All</button>
                     </div>
-                `;
-                container.appendChild(clusterDiv);
-            });
+                </div>
+                ${isIdenticalCluster ? `
+                    <div class="identical-audit-banner">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span><strong>Identical Credentials — Full Record Audit</strong> · All credential fields match. The full record details for each copy are shown below to help you identify which to keep.</span>
+                    </div>
+                ` : ''}
+                <div class="items-grid">
+                    ${displayItems.map((item, itemIndex) => renderItemCard(item, clusterIndex, itemIndex, cluster, baselineItem)).join('')}
+                </div>
+            `;
+
+            return clusterDiv;
+        }
+
+        function getClusterDisplayItems(cluster) {
+            const baselineCandidate = getBestKeepCandidate(cluster);
+            const baselineId = baselineCandidate ? baselineCandidate.id : null;
+
+            return cluster.items
+                .map((item, index) => ({ item, index }))
+                .sort((a, b) => {
+                    if (baselineId) {
+                        if (a.item.id === baselineId && b.item.id !== baselineId) return -1;
+                        if (a.item.id !== baselineId && b.item.id === baselineId) return 1;
+                    }
+
+                    return a.index - b.index;
+                })
+                .map(entry => entry.item);
         }
 
         function truncateForChip(value, maxLength) {
@@ -3532,15 +3779,6 @@
             return buildItemComparisonChips(item, cluster, true).length;
         }
 
-        function renderReportRow(label, valueHtml) {
-            return `
-                <div class="item-detail">
-                    <div class="detail-label">${escapeHtml(label)}</div>
-                    <div class="detail-value">${valueHtml}</div>
-                </div>
-            `;
-        }
-
         function renderOptionalText(value, fallback = '(none)') {
             const raw = String(value ?? '').trim();
             if (!raw) {
@@ -3558,67 +3796,105 @@
             return escapeHtml(formatDate(dateStr));
         }
 
-        function renderUrisForReport(uris) {
-            if (!Array.isArray(uris) || uris.length === 0) {
-                return '<span class="detail-value-muted">(none)</span>';
-            }
-
-            return `<ul class="uri-list">${uris.map(uri => `<li>${escapeHtml(uri)}</li>`).join('')}</ul>`;
+        function buildDetailToggle(itemId, isExpanded, controlSuffix) {
+            return `
+                <button
+                    type="button"
+                    class="item-expand-toggle ${isExpanded ? 'expanded' : ''}"
+                    onclick="toggleItemDetails('${itemId}')"
+                    aria-expanded="${isExpanded ? 'true' : 'false'}"
+                    aria-controls="item-details-${itemId}"
+                    title="${isExpanded ? 'Collapse details' : 'Expand details'}"
+                    aria-label="${isExpanded ? 'Collapse details' : 'Expand details'} (${escapeAttribute(controlSuffix)})"
+                >
+                    <span class="item-expand-glyph" aria-hidden="true">&#9654;</span>
+                </button>
+            `;
         }
 
-        function renderMultilineText(value) {
-            const raw = String(value ?? '').trim();
-            if (!raw) {
-                return '<span class="detail-value-muted">(none)</span>';
-            }
-
-            return escapeHtml(raw).replace(/\n/g, '<br>');
+        function renderStatusIndicator(isEnabled) {
+            return `<span class="detail-status ${isEnabled ? 'status-yes' : 'status-no'}" aria-label="${isEnabled ? 'Yes' : 'No'}">${isEnabled ? '&#9679;' : '&#9675;'}</span>`;
         }
 
-        function buildFullItemReport(item) {
-            const rows = [];
+        function hasFieldDifferenceAgainstBaseline(item, baselineItem, extractor, comparator = normalizeComparableValue) {
+            if (!baselineItem || item.id === baselineItem.id) return false;
+            return comparator(extractor(item)) !== comparator(extractor(baselineItem));
+        }
 
-            const pushRow = (label, valueHtml) => {
-                rows.push(renderReportRow(label, valueHtml));
-            };
+        function renderCompactDetailPair(label, valueHtml, isDifferent = false) {
+            return `<span class="detail-pair ${isDifferent ? 'diff' : ''}"><span class="detail-pair-label">${escapeHtml(label)}:</span><span class="detail-pair-value">${valueHtml}</span></span>`;
+        }
 
-            pushRow('Created', renderDateOrFallback(item.creationDate));
-            pushRow('Last Edited', renderDateOrFallback(item.revisionDate));
-            pushRow('Folder', renderOptionalText(getFolderName(item.folderId)));
-            pushRow('Favorite', item.favorite ? 'Yes' : 'No');
-            pushRow('Password History', item.hasPasswordHistory ? `${item.passwordHistoryCount} entries` : 'No');
-            pushRow('Custom Fields', item.hasCustomFields ? `${item.customFieldsCount} fields` : 'No');
+        function buildCompactItemDetails(item, baselineItem) {
+            const folderName = getFolderName(item.folderId);
+            const createdText = renderDateOrFallback(item.creationDate);
+            const editedText = renderDateOrFallback(item.revisionDate);
+            const hasNotes = !!String(item.notes || '').trim();
 
-            if (item.type === 1) {
-                pushRow('Username', renderOptionalText(item.username));
-                pushRow('URIs', renderUrisForReport(item.uris));
-                pushRow('Password', item.hasPassword ? escapeHtml(item.maskedPassword || '(present)') : '<span class="detail-value-muted">(none)</span>');
-                pushRow('TOTP', item.hasTOTP ? 'Enabled' : 'Disabled');
-                pushRow('FIDO2', item.hasFido2 ? `${item.fido2Credentials.length} credential(s)` : 'None');
-            }
+            const lineOne = [
+                renderCompactDetailPair(
+                    'Folder',
+                    renderOptionalText(folderName),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.folderId)
+                ),
+                renderCompactDetailPair(
+                    'Username',
+                    renderOptionalText(item.username),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.username)
+                ),
+                renderCompactDetailPair(
+                    'Password',
+                    item.hasPassword ? escapeHtml(item.maskedPassword || '(present)') : '<span class="detail-value-muted">(none)</span>',
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.password)
+                )
+            ];
 
-            if (item.type === 3) {
-                const card = item.card || {};
-                const last4 = card.number ? `•••• ${String(card.number).slice(-4)}` : '(none)';
-                pushRow('Card Number', escapeHtml(last4));
-                pushRow('Card Brand', renderOptionalText(card.brand));
-                pushRow('Expiration', renderOptionalText(card.expMonth && card.expYear ? `${card.expMonth}/${card.expYear}` : ''));
-            }
+            const lineTwo = [
+                renderCompactDetailPair(
+                    'Password History',
+                    renderStatusIndicator(item.hasPasswordHistory),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.hasPasswordHistory)
+                ),
+                renderCompactDetailPair(
+                    'TOTP',
+                    renderStatusIndicator(item.hasTOTP),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.hasTOTP)
+                ),
+                renderCompactDetailPair(
+                    'FIDO2',
+                    renderStatusIndicator(item.hasFido2),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => getComparableFido2Value(current), normalizeComparableValue)
+                ),
+                renderCompactDetailPair(
+                    'Custom Fields',
+                    renderStatusIndicator(item.hasCustomFields),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.hasCustomFields)
+                ),
+                renderCompactDetailPair(
+                    'Notes',
+                    renderStatusIndicator(hasNotes),
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.notes)
+                )
+            ];
 
-            if (item.type === 4) {
-                const identity = item.identity || {};
-                pushRow('First Name', renderOptionalText(identity.firstName));
-                pushRow('Last Name', renderOptionalText(identity.lastName));
-                pushRow('Email', renderOptionalText(identity.email));
-                pushRow('Identity Username', renderOptionalText(identity.username));
-            }
+            const lineThree = [
+                renderCompactDetailPair(
+                    'Created',
+                    createdText,
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.creationDate)
+                ),
+                renderCompactDetailPair(
+                    'Last Edited',
+                    editedText,
+                    hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.revisionDate)
+                )
+            ];
 
-            pushRow('Notes', renderMultilineText(item.notes));
-
-            return {
-                html: rows.join(''),
-                count: rows.length
-            };
+            return `
+                <div class="item-report-line">${lineOne.join('')}</div>
+                <div class="item-report-line">${lineTwo.join('')}</div>
+                <div class="item-report-line">${lineThree.join('')}</div>
+            `;
         }
 
         /**
@@ -3628,18 +3904,21 @@
          * @param {number} itemIndex - Item index within cluster
          * @returns {string} - HTML string
          */
-        function renderItemCard(item, clusterIndex, itemIndex, cluster) {
-            const typeName = getTypeName(item.type);
+        function renderItemCard(item, clusterIndex, itemIndex, cluster, baselineItem) {
             const isMarked = itemsToDelete.has(item.id);
             const isBaselineItem = itemIndex === 0;
-            const showFullReport = cluster.matchScore === 100;
-            const fullReport = showFullReport ? buildFullItemReport(item) : null;
-            const differenceChips = showFullReport
-                ? []
-                : (isBaselineItem ? buildItemComparisonChips(item, cluster, true) : buildItemComparisonChips(item, cluster, false));
-            const baselineSummaryCount = showFullReport
-                ? fullReport.count
-                : (isBaselineItem ? getBaselineSummaryCount(item, cluster) : 0);
+            const isExpanded = expandedItemDetails.has(item.id);
+            const baselineSummaryCount = isBaselineItem ? getBaselineSummaryCount(item, cluster) : 0;
+            const createdInline = renderCompactDetailPair(
+                'Created',
+                renderDateOrFallback(item.creationDate),
+                hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.creationDate)
+            );
+            const editedInline = renderCompactDetailPair(
+                'Last Edited',
+                renderDateOrFallback(item.revisionDate),
+                hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.revisionDate)
+            );
 
             return `
                 <div class="item-card ${isBaselineItem ? 'item-card-baseline item-card-baseline-expanded' : ''} ${isMarked ? 'marked-delete' : ''}" id="item-${item.id}">
@@ -3655,28 +3934,30 @@
                                     aria-label="Mark item for deletion"
                                 >
                                 <span class="item-name">${escapeHtml(item.name)}</span>
+                                <span class="item-name-meta-inline">${createdInline}${editedInline}</span>
                             </div>
-                            <span class="item-type-badge">${escapeHtml(typeName)}</span>
-                            <span class="item-card-subtitle">${showFullReport ? 'Report' : (isBaselineItem ? 'Baseline' : 'Diff')}</span>
-                            ${showFullReport || isBaselineItem ? `<span class="item-baseline-count">${baselineSummaryCount} fields</span>` : ''}
+                            <div class="item-meta-row">
+                                <span class="item-meta-group">
+                                    ${buildDetailToggle(item.id, isExpanded, 'Details')}
+                                    <span class="item-card-subtitle">${isBaselineItem ? 'Baseline' : 'Diff'}</span>
+                                    ${isBaselineItem ? `
+                                        <span class="item-baseline-count">${baselineSummaryCount} fields</span>
+                                    ` : ''}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="item-delete-control">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M9 3h6m-9 4h12m-1 0-.7 10.1A2 2 0 0 1 14.3 19H9.7a2 2 0 0 1-1.99-1.9L7 7m3 4v4m4-4v4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                         </div>
                     </div>
 
-                    ${showFullReport ? `
-                        <div class="item-full-report">
-                            ${fullReport.html}
+                    ${isExpanded ? `
+                        <div class="item-compact-report" id="item-details-${item.id}">
+                            ${buildCompactItemDetails(item, baselineItem)}
                         </div>
-                    ` : `
-                        <div class="item-chip-list ${isBaselineItem ? 'item-baseline-expanded-list' : ''}">
-                            ${differenceChips.length > 0 ? differenceChips.join('') : '<span class="item-compact-chip present"><span class="chip-label">Match</span><span class="chip-value">no differences</span></span>'}
-                        </div>
-                    `}
-
-                    <div class="item-delete-control">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M9 3h6m-9 4h12m-1 0-.7 10.1A2 2 0 0 1 14.3 19H9.7a2 2 0 0 1-1.99-1.9L7 7m3 4v4m4-4v4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                    ` : ''}
 
                 </div>
             `;
@@ -3778,33 +4059,6 @@
          */
         function toggleItemDeletion(itemId) {
             setItemMarkedState(itemId, !itemsToDelete.has(itemId));
-            updateStats();
-        }
-
-        /**
-         * Keep newest item in cluster, mark others for deletion
-         * @param {number} clusterIndex - Cluster index
-         */
-        function keepNewestInCluster(clusterIndex) {
-            const cluster = duplicateClusters[clusterIndex];
-
-            // Find newest item by revisionDate
-            let newestItem = cluster.items[0];
-            cluster.items.forEach(item => {
-                if (item.revisionDate > newestItem.revisionDate) {
-                    newestItem = item;
-                }
-            });
-
-            // Mark all others for deletion
-            cluster.items.forEach(item => {
-                if (item.id !== newestItem.id) {
-                    setItemMarkedState(item.id, true);
-                } else {
-                    setItemMarkedState(item.id, false);
-                }
-            });
-
             updateStats();
         }
 
@@ -3966,184 +4220,6 @@
          * Show CLI scripts modal
          */
         function showCLIScripts() {
-            /*
-            if (itemsToDelete.size === 0 && !originalData.items.some(i => i.isNexoMerge)) {
-                alert('⚠️ No changes detected (deletions or merges).');
-                return;
-            }
-
-            // 1. Get items to delete
-            const itemsArray = Array.from(itemsToDelete).map(id => {
-                const item = items.find(i => i.id === id);
-                return {
-                    id: item.id,
-                    name: item.name || 'Untitled'
-                };
-            });
-
-            // 2. Get items to create (Merges)
-            const mergesArray = originalData.items
-                .filter(i => i.isNexoMerge)
-                .map(item => {
-                    // Create a clean copy without Nexo metadata for the CLI
-                    const cleanItem = JSON.parse(JSON.stringify(item));
-                        let bashScript = `#!/usr/bin/env bash\nset -euo pipefail\n\n`;
-                        bashScript += `print_step() { printf '\\033[36m[→]\\033[0m %s\\n' "$1"; }\n`;
-                        bashScript += `print_success() { printf '\\033[32m[✓]\\033[0m %s\\n' "$1"; }\n`;
-                        bashScript += `print_failure() { printf '\\033[31m[✗]\\033[0m %s\\n' "$1"; }\n\n`;
-                        bashScript += `main() {\n`;
-                        bashScript += `  # Nexo CLI Action Script\n`;
-
-                    // Remove read-only/metadata fields that 'bw create item' may reject
-                    delete cleanItem.revisionDate;
-                        bashScript += `  if ! command -v bw >/dev/null 2>&1; then\n`;
-                        bashScript += `    print_failure 'Bitwarden CLI is not installed or not on PATH'\n`;
-                        bashScript += `    return 1\n`;
-                        bashScript += `  fi\n\n`;
-                        bashScript += `  # Make sure you're logged in and have BW_SESSION set:\n`;
-                        bashScript += `  export BW_SESSION="$(bw unlock --raw)"\n\n`;
-
-                        bashScript += `  print_step 'Syncing vault before applying changes'\n`;
-                        bashScript += `  if bw sync; then\n`;
-                        bashScript += `    print_success 'Vault synced successfully'\n`;
-                        bashScript += `  else\n`;
-                        bashScript += `    print_failure 'Vault sync failed'\n`;
-                        bashScript += `    return 1\n`;
-                        bashScript += `  fi\n\n`;
-            bashScript += `# Nexo CLI Automation Script\n`;
-            bashScript += `# Generated: ${new Date().toISOString()}\n`;
-                            bashScript += `  print_step 'Creating merged records'\n`;
-            bashScript += `# Merged records to create: ${mergesArray.length}\n\n`;
-                                bashScript += `  # Merge ${index + 1}: ${merge.name}\n`;
-            bashScript += `export BW_SESSION="$(bw unlock --raw)"\n\n`;
-
-                                bashScript += `  print_step 'Creating merged record: ${shellName}'\n`;
-                                bashScript += `  if echo '${shellJson}' | bw encode | bw create item; then\n`;
-                                bashScript += `    print_success 'Created merged record: ${shellName}'\n`;
-                                bashScript += `  else\n`;
-                                bashScript += `    print_failure 'Failed to create merged record: ${shellName}'\n`;
-                                bashScript += `    return 1\n`;
-                                bashScript += `  fi\n`;
-            bashScript += `else\n`;
-            bashScript += `  print_failure 'Vault sync failed'\n`;
-            bashScript += `  exit 1\n`;
-            bashScript += `fi\n\n`;
-
-                            bashScript += `  print_step 'Deleting selected items'\n`;
-                bashScript += `print_step 'Creating merged records'\n`;
-                                bashScript += `  # Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `# Merge ${index + 1}: ${merge.name}\n`;
-                                bashScript += `  print_step 'Deleting item: ${shellName}'\n`;
-                                bashScript += `  if bw delete item ${item.id}; then\n`;
-                                bashScript += `    print_success 'Deleted item: ${shellName}'\n`;
-                                bashScript += `  else\n`;
-                                bashScript += `    print_failure 'Failed to delete item: ${shellName}'\n`;
-                                bashScript += `    return 1\n`;
-                                bashScript += `  fi\n`;
-                    bashScript += `  exit 1\n`;
-                    bashScript += `fi\n`;
-                });
-                        bashScript += `\n  print_success 'Cleanup complete'\n`;
-                        bashScript += `}\n\nmain "$@"\n`;
-            }
-
-                        let psScript = `# Nexo CLI Action Script\n`;
-                bashScript += `print_step 'Deleting selected items'\n`;
-                itemsArray.forEach((item, index) => {
-                    bashScript += `# Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `  print_success 'Deleted item: ${shellName}'\n`;
-                    bashScript += `else\n`;
-                    bashScript += `  print_failure 'Failed to delete item: ${shellName}'\n`;
-                    bashScript += `  exit 1\n`;
-                        psScript += `function Invoke-NexoCleanup {\n`;
-                        psScript += `    param([string]$BwSession)\n`;
-                        psScript += `    $env:BW_SESSION = $BwSession\n\n`;
-                        psScript += `    try {\n`;
-                        psScript += `        Write-Step 'Syncing vault before applying changes'\n`;
-                        psScript += `        bw sync\n`;
-                        psScript += `        if ($LASTEXITCODE -eq 0) {\n`;
-                        psScript += `            Write-Success 'Vault synced successfully'\n`;
-                        psScript += `        } else {\n`;
-                        psScript += `            Write-Failure 'Vault sync failed'\n`;
-                        psScript += `            return $false\n`;
-                        psScript += `        }\n\n`;
-            psScript += `# Items to delete: ${itemsArray.length}\n`;
-            psScript += `# Merged records to create: ${mergesArray.length}\n\n`;
-                            psScript += `        Write-Step 'Creating merged records'\n`;
-            psScript += `$env:BW_SESSION = bw unlock --raw\n\n`;
-                                psScript += `        # Merge ${index + 1}: ${merge.name}\n`;
-            psScript += `$ErrorActionPreference = 'Stop'\n`;
-            psScript += `function Write-Step { param([string]$Message) Write-Host "→ $Message" -ForegroundColor Cyan }\n`;
-                                psScript += `        Write-Step 'Creating merged record: ${psName}'\n`;
-                                psScript += `        $mergeJson = @'\n${psJson}\n'@\n`;
-                                psScript += `        $encodedMerge = $mergeJson | bw encode\n`;
-                                psScript += `        if ($LASTEXITCODE -ne 0) { Write-Failure 'Failed to encode merged record: ${psName}'; return $false }\n`;
-                                psScript += `        $encodedMerge | bw create item\n`;
-                                psScript += `        if ($LASTEXITCODE -eq 0) { Write-Success 'Created merged record: ${psName}' } else { Write-Failure 'Failed to create merged record: ${psName}'; return $false }\n`;
-            psScript += `    Write-Success 'Vault synced successfully'\n`;
-            psScript += `} else {\n`;
-            psScript += `    Write-Failure 'Vault sync failed'\n`;
-            psScript += `    exit 1\n`;
-            psScript += `}\n\n`;
-                            psScript += `        Write-Step 'Deleting selected items'\n`;
-            if (mergesArray.length > 0) {
-                                psScript += `        # Deletion ${index + 1}: ${item.name}\n`;
-                mergesArray.forEach((merge, index) => {
-                                psScript += `        Write-Step 'Deleting item: ${psName}'\n`;
-                                psScript += `        bw delete item ${item.id}\n`;
-                                psScript += `        if ($LASTEXITCODE -eq 0) { Write-Success 'Deleted item: ${psName}' } else { Write-Failure 'Failed to delete item: ${psName}'; return $false }\n`;
-                    psScript += `Write-Step 'Creating merged record: ${psName}'\n`;
-                    psScript += `$mergeJson = @'\n${psJson}\n'@\n`;
-                    psScript += `$encodedMerge = $mergeJson | bw encode\n`;
-                        psScript += `\n        Write-Success 'Cleanup complete'\n`;
-                        psScript += `        return $true\n`;
-                        psScript += `    } catch {\n`;
-                        psScript += `        Write-Failure $_.Exception.Message\n`;
-                        psScript += `        return $false\n`;
-                        psScript += `    }\n`;
-                        psScript += `}\n\n`;
-                        psScript += `try {\n`;
-                        psScript += `    $bwSession = (bw unlock --raw).Trim()\n`;
-                        psScript += `} catch {\n`;
-                        psScript += `    Write-Failure 'Failed to unlock Bitwarden vault'\n`;
-                        psScript += `    return\n`;
-                        psScript += `}\n\n`;
-                        psScript += `if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($bwSession)) {\n`;
-                        psScript += `    Write-Failure 'Failed to unlock Bitwarden vault'\n`;
-                        psScript += `    return\n`;
-                        psScript += `}\n\n`;
-                        psScript += `if (-not (Invoke-NexoCleanup -BwSession $bwSession)) {\n`;
-                        psScript += `    Write-Error 'Cleanup script ended with errors.'\n`;
-                        psScript += `}\n`;
-                    psScript += `$encodedMerge | bw create item\n`;
-                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Created merged record: ${psName}' } else { Write-Failure 'Failed to create merged record: ${psName}'; exit 1 }\n`;
-                });
-                psScript += `\n`;
-            }
-
-            if (itemsArray.length > 0) {
-                psScript += `Write-Step 'Deleting selected items'\n`;
-                itemsArray.forEach((item, index) => {
-                    psScript += `# Deletion ${index + 1}: ${item.name}\n`;
-                    const psName = escapePowerShellSingleQuoted(item.name);
-                    psScript += `Write-Step 'Deleting item: ${psName}'\n`;
-                    psScript += `bw delete item ${item.id}\n`;
-                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Deleted item: ${psName}' } else { Write-Failure 'Failed to delete item: ${psName}'; exit 1 }\n`;
-                });
-            }
-
-            psScript += `\nWrite-Success 'Cleanup complete'\n`;
-
-            // Set script content
-            document.getElementById('bashScriptText').value = bashScript;
-            document.getElementById('powershellScriptText').value = psScript;
-
-            // Show modal
-            document.getElementById('cliScriptModal').classList.add('show');
-            */
-        }
-
-        function showCLIScripts() {
             if (itemsToDelete.size === 0 && !originalData.items.some(i => i.isNexoMerge)) {
                 alert('⚠️ No changes detected (deletions or merges).');
                 return;
@@ -4174,13 +4250,41 @@
                 });
 
             const escapeShellSingleQuoted = (text) => String(text).replace(/'/g, `'\''`);
-            const escapePowerShellSingleQuoted = (text) => String(text).replace(/'/g, "''");
+            // Wrap PowerShell string values in double quotes ("), not single quotes ('),
+            // so a single quote inside a -Name value needs no escaping. Double-quoted
+            // strings require escaping the backtick (escape char), $, and " — in that order.
+            const escapePowerShellDoubleQuoted = (text) => String(text).replace(/`/g, '``').replace(/\$/g, '`$').replace(/"/g, '`"');
             const escapeDoubleQuoted = (text) => String(text).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
 
             let bashScript = `#!/usr/bin/env bash\nset -o pipefail\n\n`;
             bashScript += `print_step() { printf '\\033[36m[→]\\033[0m %s\\n' "$1"; }\n`;
             bashScript += `print_success() { printf '✅ Success!\\n'; }\n`;
             bashScript += `print_failure() { printf '❌ Failed!\\n'; }\n\n`;
+
+            bashScript += `new_bw_record() {\n`;
+            bashScript += `  local name="$1"\n`;
+            bashScript += `  local json="$2"\n`;
+            bashScript += `  printf 'Creating record %s .... ' "$name"\n`;
+            bashScript += `  if echo "$json" | bw encode | bw create item >/dev/null; then\n`;
+            bashScript += `    printf '✅ Success!\\n'\n`;
+            bashScript += `  else\n`;
+            bashScript += `    printf '❌ Failed!\\n'\n`;
+            bashScript += `    return 1\n`;
+            bashScript += `  fi\n`;
+            bashScript += `}\n\n`;
+
+            bashScript += `remove_bw_record() {\n`;
+            bashScript += `  local id="$1"\n`;
+            bashScript += `  local name="$2"\n`;
+            bashScript += `  printf 'Deleting record %s .... ' "$name"\n`;
+            bashScript += `  if bw delete item "$id" >/dev/null; then\n`;
+            bashScript += `    printf '✅ Success!\\n'\n`;
+            bashScript += `  else\n`;
+            bashScript += `    printf '❌ Failed!\\n'\n`;
+            bashScript += `    return 1\n`;
+            bashScript += `  fi\n`;
+            bashScript += `}\n\n`;
+
             bashScript += `main() {\n`;
             bashScript += `  # Nexo CLI Action Script\n`;
             bashScript += `  # Generated: ${new Date().toISOString()}\n`;
@@ -4209,13 +4313,7 @@
                     const shellName = escapeShellSingleQuoted(merge.name);
                     const shellJson = escapeShellSingleQuoted(merge.json);
                     bashScript += `  # Merge ${index + 1}: ${merge.name}\n`;
-                    bashScript += `  printf 'Creating record ${shellName} .... '\n`;
-                    bashScript += `  if echo '${shellJson}' | bw encode | bw create item; then\n`;
-                    bashScript += `    printf '✅ Success!\\n'\n`;
-                    bashScript += `  else\n`;
-                    bashScript += `    print_failure\n`;
-                    bashScript += `    return 1\n`;
-                    bashScript += `  fi\n`;
+                    bashScript += `  new_bw_record '${shellName}' '${shellJson}' || return 1\n`;
                 });
                 bashScript += `\n`;
             }
@@ -4225,13 +4323,7 @@
                 itemsArray.forEach((item, index) => {
                     const shellName = escapeShellSingleQuoted(item.name);
                     bashScript += `  # Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `  printf 'Deleting record ${shellName} .... '\n`;
-                    bashScript += `  if bw delete item ${item.id}; then\n`;
-                    bashScript += `    printf '✅ Success!\\n'\n`;
-                    bashScript += `  else\n`;
-                    bashScript += `    print_failure\n`;
-                    bashScript += `    return 1\n`;
-                    bashScript += `  fi\n`;
+                    bashScript += `  remove_bw_record '${item.id}' '${shellName}' || return 1\n`;
                 });
             }
 
@@ -4246,6 +4338,23 @@
             psScript += `function Write-Step { param([string]$Message) Write-Host "→ $Message" -ForegroundColor Cyan }\n`;
             psScript += `function Write-Success { Write-Host '✅ Success!' -ForegroundColor Green }\n`;
             psScript += `function Write-Failure { Write-Host '❌ Failed!' -ForegroundColor Red }\n\n`;
+
+            psScript += `function New-BwRecord {\n`;
+            psScript += `    param([string]$Name, [string]$Json)\n`;
+            psScript += `    Write-Host -NoNewline "Creating record $Name .... "\n`;
+            psScript += `    $encoded = $Json | bw encode\n`;
+            psScript += `    if ($LASTEXITCODE -ne 0) { Write-Host '❌ Failed (encode)!' -ForegroundColor Red; throw "Encoding failed for $Name" }\n`;
+            psScript += `    $encoded | bw create item | Out-Null\n`;
+            psScript += `    if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Host '❌ Failed!' -ForegroundColor Red; throw "Creation failed for $Name" }\n`;
+            psScript += `}\n\n`;
+
+            psScript += `function Remove-BwRecord {\n`;
+            psScript += `    param([string]$Id, [string]$Name)\n`;
+            psScript += `    Write-Host -NoNewline "Deleting record $Name .... "\n`;
+            psScript += `    bw delete item $Id | Out-Null\n`;
+            psScript += `    if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Host '❌ Failed!' -ForegroundColor Red; throw "Deletion failed for $Name" }\n`;
+            psScript += `}\n\n`;
+
             psScript += `function Invoke-NexoCleanup {\n`;
             psScript += `    param([string]$BwSession)\n`;
             psScript += `    $env:BW_SESSION = $BwSession\n\n`;
@@ -4262,15 +4371,10 @@
             if (mergesArray.length > 0) {
                 psScript += `        Write-Step 'Creating merged records'\n`;
                 mergesArray.forEach((merge, index) => {
-                    const psName = escapePowerShellSingleQuoted(merge.name);
-                    const psJson = escapePowerShellSingleQuoted(merge.json);
+                    const psName = escapePowerShellDoubleQuoted(merge.name);
+                    const psJson = escapePowerShellDoubleQuoted(merge.json);
                     psScript += `        # Merge ${index + 1}: ${merge.name}\n`;
-                    psScript += `        Write-Host -NoNewline 'Creating record ${psName} .... '\n`;
-                    psScript += `        $mergeJson = @'\n${psJson}\n'@\n`;
-                    psScript += `        $encodedMerge = $mergeJson | bw encode\n`;
-                    psScript += `        if ($LASTEXITCODE -ne 0) { Write-Failure; return $false }\n`;
-                    psScript += `        $encodedMerge | bw create item\n`;
-                    psScript += `        if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Failure; return $false }\n`;
+                    psScript += `        New-BwRecord -Name "${psName}" -Json "${psJson}"\n`;
                 });
                 psScript += `\n`;
             }
@@ -4278,11 +4382,9 @@
             if (itemsArray.length > 0) {
                 psScript += `        Write-Step 'Deleting selected items'\n`;
                 itemsArray.forEach((item, index) => {
-                    const psName = escapePowerShellSingleQuoted(item.name);
+                    const psName = escapePowerShellDoubleQuoted(item.name);
                     psScript += `        # Deletion ${index + 1}: ${item.name}\n`;
-                    psScript += `        Write-Host -NoNewline 'Deleting record ${psName} .... '\n`;
-                    psScript += `        bw delete item ${item.id}\n`;
-                    psScript += `        if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Failure; return $false }\n`;
+                    psScript += `        Remove-BwRecord -Id "${item.id}" -Name "${psName}"\n`;
                 });
             }
 
