@@ -191,7 +191,7 @@
         .page-title h1 {
             color: var(--fg-base);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.75rem;
             font-size: clamp(2.35rem, 4.75vw, 3.3rem);
             font-weight: 700;
@@ -580,6 +580,16 @@
             contain-intrinsic-size: 360px;
         }
 
+        .cluster.merge-available {
+            background: #f4faf9;
+            border-color: var(--teal-light);
+        }
+
+        :root[data-theme="dark"] .cluster.merge-available {
+            background: #1e3540;
+            border-color: var(--teal-deep);
+        }
+
         .cluster:hover {
             box-shadow: var(--shadow-md);
         }
@@ -864,8 +874,16 @@
             display: flex;
             align-items: flex-start;
             gap: 0.4rem;
+            flex-wrap: wrap;
             min-width: 0;
             flex: 1;
+        }
+
+        .item-name-meta-inline {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.3rem;
         }
 
         .item-meta-row {
@@ -1215,11 +1233,12 @@
         }
 
         .detail-status.status-yes {
-            color: var(--success);
+            color: var(--fg-base);
         }
 
         .detail-status.status-no {
-            color: var(--danger);
+            color: var(--fg-ghost);
+            opacity: 0.6;
         }
 
         .detail-label {
@@ -2377,7 +2396,52 @@
                 expandedItemDetails.add(itemId);
             }
 
-            renderClusters();
+            const card = document.getElementById(`item-${itemId}`);
+            if (!card) {
+                renderClusters();
+                return;
+            }
+
+            let targetCluster = null;
+            let targetItem = null;
+
+            for (const cluster of duplicateClusters) {
+                const match = cluster.items.find(item => item.id === itemId);
+                if (match) {
+                    targetCluster = cluster;
+                    targetItem = match;
+                    break;
+                }
+            }
+
+            if (!targetCluster || !targetItem) {
+                renderClusters();
+                return;
+            }
+
+            const isExpanded = expandedItemDetails.has(itemId);
+            const toggle = card.querySelector('.item-expand-toggle');
+            if (toggle) {
+                toggle.classList.toggle('expanded', isExpanded);
+                toggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                toggle.setAttribute('title', isExpanded ? 'Collapse details' : 'Expand details');
+            }
+
+            const detailsId = `item-details-${itemId}`;
+            const existingDetails = card.querySelector(`#${detailsId}`);
+
+            if (isExpanded) {
+                if (!existingDetails) {
+                    const baselineItem = getBestKeepCandidate(targetCluster);
+                    const details = document.createElement('div');
+                    details.className = 'item-compact-report';
+                    details.id = detailsId;
+                    details.innerHTML = buildCompactItemDetails(targetItem, baselineItem);
+                    card.appendChild(details);
+                }
+            } else if (existingDetails) {
+                existingDetails.remove();
+            }
         }
 
         function getActiveClusterPresetDefinition() {
@@ -3550,6 +3614,9 @@
         function buildClusterCard(cluster, clusterIndex, visibleIndex) {
             const clusterDiv = document.createElement('div');
             clusterDiv.className = 'cluster';
+            if (cluster.mergeCandidate && !cluster.hasConflict) {
+                clusterDiv.classList.add('merge-available');
+            }
             const displayItems = getClusterDisplayItems(cluster);
             const baselineItem = displayItems[0] || null;
 
@@ -3571,7 +3638,6 @@
                                 ${cluster.targetedMergeId ? 'Edit Merge' : 'Review & Merge'}
                             </button>
                         ` : ''}
-                        <button class="btn btn-secondary btn-sm" onclick="keepNewestInCluster(${clusterIndex})">Keep Newest</button>
                         <button class="btn btn-secondary btn-sm" onclick="selectAllInCluster(${clusterIndex})">Select All</button>
                     </div>
                 </div>
@@ -3747,7 +3813,7 @@
         }
 
         function renderStatusIndicator(isEnabled) {
-            return `<span class="detail-status ${isEnabled ? 'status-yes' : 'status-no'}" aria-label="${isEnabled ? 'Yes' : 'No'}">${isEnabled ? '&#10003;' : '&#10007;'}</span>`;
+            return `<span class="detail-status ${isEnabled ? 'status-yes' : 'status-no'}" aria-label="${isEnabled ? 'Yes' : 'No'}">${isEnabled ? '&#9679;' : '&#9675;'}</span>`;
         }
 
         function hasFieldDifferenceAgainstBaseline(item, baselineItem, extractor, comparator = normalizeComparableValue) {
@@ -3843,6 +3909,16 @@
             const isBaselineItem = itemIndex === 0;
             const isExpanded = expandedItemDetails.has(item.id);
             const baselineSummaryCount = isBaselineItem ? getBaselineSummaryCount(item, cluster) : 0;
+            const createdInline = renderCompactDetailPair(
+                'Created',
+                renderDateOrFallback(item.creationDate),
+                hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.creationDate)
+            );
+            const editedInline = renderCompactDetailPair(
+                'Last Edited',
+                renderDateOrFallback(item.revisionDate),
+                hasFieldDifferenceAgainstBaseline(item, baselineItem, current => current.revisionDate)
+            );
 
             return `
                 <div class="item-card ${isBaselineItem ? 'item-card-baseline item-card-baseline-expanded' : ''} ${isMarked ? 'marked-delete' : ''}" id="item-${item.id}">
@@ -3858,6 +3934,7 @@
                                     aria-label="Mark item for deletion"
                                 >
                                 <span class="item-name">${escapeHtml(item.name)}</span>
+                                <span class="item-name-meta-inline">${createdInline}${editedInline}</span>
                             </div>
                             <div class="item-meta-row">
                                 <span class="item-meta-group">
@@ -3982,33 +4059,6 @@
          */
         function toggleItemDeletion(itemId) {
             setItemMarkedState(itemId, !itemsToDelete.has(itemId));
-            updateStats();
-        }
-
-        /**
-         * Keep newest item in cluster, mark others for deletion
-         * @param {number} clusterIndex - Cluster index
-         */
-        function keepNewestInCluster(clusterIndex) {
-            const cluster = duplicateClusters[clusterIndex];
-
-            // Find newest item by revisionDate
-            let newestItem = cluster.items[0];
-            cluster.items.forEach(item => {
-                if (item.revisionDate > newestItem.revisionDate) {
-                    newestItem = item;
-                }
-            });
-
-            // Mark all others for deletion
-            cluster.items.forEach(item => {
-                if (item.id !== newestItem.id) {
-                    setItemMarkedState(item.id, true);
-                } else {
-                    setItemMarkedState(item.id, false);
-                }
-            });
-
             updateStats();
         }
 
@@ -4170,184 +4220,6 @@
          * Show CLI scripts modal
          */
         function showCLIScripts() {
-            /*
-            if (itemsToDelete.size === 0 && !originalData.items.some(i => i.isNexoMerge)) {
-                alert('⚠️ No changes detected (deletions or merges).');
-                return;
-            }
-
-            // 1. Get items to delete
-            const itemsArray = Array.from(itemsToDelete).map(id => {
-                const item = items.find(i => i.id === id);
-                return {
-                    id: item.id,
-                    name: item.name || 'Untitled'
-                };
-            });
-
-            // 2. Get items to create (Merges)
-            const mergesArray = originalData.items
-                .filter(i => i.isNexoMerge)
-                .map(item => {
-                    // Create a clean copy without Nexo metadata for the CLI
-                    const cleanItem = JSON.parse(JSON.stringify(item));
-                        let bashScript = `#!/usr/bin/env bash\nset -euo pipefail\n\n`;
-                        bashScript += `print_step() { printf '\\033[36m[→]\\033[0m %s\\n' "$1"; }\n`;
-                        bashScript += `print_success() { printf '\\033[32m[✓]\\033[0m %s\\n' "$1"; }\n`;
-                        bashScript += `print_failure() { printf '\\033[31m[✗]\\033[0m %s\\n' "$1"; }\n\n`;
-                        bashScript += `main() {\n`;
-                        bashScript += `  # Nexo CLI Action Script\n`;
-
-                    // Remove read-only/metadata fields that 'bw create item' may reject
-                    delete cleanItem.revisionDate;
-                        bashScript += `  if ! command -v bw >/dev/null 2>&1; then\n`;
-                        bashScript += `    print_failure 'Bitwarden CLI is not installed or not on PATH'\n`;
-                        bashScript += `    return 1\n`;
-                        bashScript += `  fi\n\n`;
-                        bashScript += `  # Make sure you're logged in and have BW_SESSION set:\n`;
-                        bashScript += `  export BW_SESSION="$(bw unlock --raw)"\n\n`;
-
-                        bashScript += `  print_step 'Syncing vault before applying changes'\n`;
-                        bashScript += `  if bw sync; then\n`;
-                        bashScript += `    print_success 'Vault synced successfully'\n`;
-                        bashScript += `  else\n`;
-                        bashScript += `    print_failure 'Vault sync failed'\n`;
-                        bashScript += `    return 1\n`;
-                        bashScript += `  fi\n\n`;
-            bashScript += `# Nexo CLI Automation Script\n`;
-            bashScript += `# Generated: ${new Date().toISOString()}\n`;
-                            bashScript += `  print_step 'Creating merged records'\n`;
-            bashScript += `# Merged records to create: ${mergesArray.length}\n\n`;
-                                bashScript += `  # Merge ${index + 1}: ${merge.name}\n`;
-            bashScript += `export BW_SESSION="$(bw unlock --raw)"\n\n`;
-
-                                bashScript += `  print_step 'Creating merged record: ${shellName}'\n`;
-                                bashScript += `  if echo '${shellJson}' | bw encode | bw create item; then\n`;
-                                bashScript += `    print_success 'Created merged record: ${shellName}'\n`;
-                                bashScript += `  else\n`;
-                                bashScript += `    print_failure 'Failed to create merged record: ${shellName}'\n`;
-                                bashScript += `    return 1\n`;
-                                bashScript += `  fi\n`;
-            bashScript += `else\n`;
-            bashScript += `  print_failure 'Vault sync failed'\n`;
-            bashScript += `  exit 1\n`;
-            bashScript += `fi\n\n`;
-
-                            bashScript += `  print_step 'Deleting selected items'\n`;
-                bashScript += `print_step 'Creating merged records'\n`;
-                                bashScript += `  # Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `# Merge ${index + 1}: ${merge.name}\n`;
-                                bashScript += `  print_step 'Deleting item: ${shellName}'\n`;
-                                bashScript += `  if bw delete item ${item.id}; then\n`;
-                                bashScript += `    print_success 'Deleted item: ${shellName}'\n`;
-                                bashScript += `  else\n`;
-                                bashScript += `    print_failure 'Failed to delete item: ${shellName}'\n`;
-                                bashScript += `    return 1\n`;
-                                bashScript += `  fi\n`;
-                    bashScript += `  exit 1\n`;
-                    bashScript += `fi\n`;
-                });
-                        bashScript += `\n  print_success 'Cleanup complete'\n`;
-                        bashScript += `}\n\nmain "$@"\n`;
-            }
-
-                        let psScript = `# Nexo CLI Action Script\n`;
-                bashScript += `print_step 'Deleting selected items'\n`;
-                itemsArray.forEach((item, index) => {
-                    bashScript += `# Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `  print_success 'Deleted item: ${shellName}'\n`;
-                    bashScript += `else\n`;
-                    bashScript += `  print_failure 'Failed to delete item: ${shellName}'\n`;
-                    bashScript += `  exit 1\n`;
-                        psScript += `function Invoke-NexoCleanup {\n`;
-                        psScript += `    param([string]$BwSession)\n`;
-                        psScript += `    $env:BW_SESSION = $BwSession\n\n`;
-                        psScript += `    try {\n`;
-                        psScript += `        Write-Step 'Syncing vault before applying changes'\n`;
-                        psScript += `        bw sync\n`;
-                        psScript += `        if ($LASTEXITCODE -eq 0) {\n`;
-                        psScript += `            Write-Success 'Vault synced successfully'\n`;
-                        psScript += `        } else {\n`;
-                        psScript += `            Write-Failure 'Vault sync failed'\n`;
-                        psScript += `            return $false\n`;
-                        psScript += `        }\n\n`;
-            psScript += `# Items to delete: ${itemsArray.length}\n`;
-            psScript += `# Merged records to create: ${mergesArray.length}\n\n`;
-                            psScript += `        Write-Step 'Creating merged records'\n`;
-            psScript += `$env:BW_SESSION = bw unlock --raw\n\n`;
-                                psScript += `        # Merge ${index + 1}: ${merge.name}\n`;
-            psScript += `$ErrorActionPreference = 'Stop'\n`;
-            psScript += `function Write-Step { param([string]$Message) Write-Host "→ $Message" -ForegroundColor Cyan }\n`;
-                                psScript += `        Write-Step 'Creating merged record: ${psName}'\n`;
-                                psScript += `        $mergeJson = @'\n${psJson}\n'@\n`;
-                                psScript += `        $encodedMerge = $mergeJson | bw encode\n`;
-                                psScript += `        if ($LASTEXITCODE -ne 0) { Write-Failure 'Failed to encode merged record: ${psName}'; return $false }\n`;
-                                psScript += `        $encodedMerge | bw create item\n`;
-                                psScript += `        if ($LASTEXITCODE -eq 0) { Write-Success 'Created merged record: ${psName}' } else { Write-Failure 'Failed to create merged record: ${psName}'; return $false }\n`;
-            psScript += `    Write-Success 'Vault synced successfully'\n`;
-            psScript += `} else {\n`;
-            psScript += `    Write-Failure 'Vault sync failed'\n`;
-            psScript += `    exit 1\n`;
-            psScript += `}\n\n`;
-                            psScript += `        Write-Step 'Deleting selected items'\n`;
-            if (mergesArray.length > 0) {
-                                psScript += `        # Deletion ${index + 1}: ${item.name}\n`;
-                mergesArray.forEach((merge, index) => {
-                                psScript += `        Write-Step 'Deleting item: ${psName}'\n`;
-                                psScript += `        bw delete item ${item.id}\n`;
-                                psScript += `        if ($LASTEXITCODE -eq 0) { Write-Success 'Deleted item: ${psName}' } else { Write-Failure 'Failed to delete item: ${psName}'; return $false }\n`;
-                    psScript += `Write-Step 'Creating merged record: ${psName}'\n`;
-                    psScript += `$mergeJson = @'\n${psJson}\n'@\n`;
-                    psScript += `$encodedMerge = $mergeJson | bw encode\n`;
-                        psScript += `\n        Write-Success 'Cleanup complete'\n`;
-                        psScript += `        return $true\n`;
-                        psScript += `    } catch {\n`;
-                        psScript += `        Write-Failure $_.Exception.Message\n`;
-                        psScript += `        return $false\n`;
-                        psScript += `    }\n`;
-                        psScript += `}\n\n`;
-                        psScript += `try {\n`;
-                        psScript += `    $bwSession = (bw unlock --raw).Trim()\n`;
-                        psScript += `} catch {\n`;
-                        psScript += `    Write-Failure 'Failed to unlock Bitwarden vault'\n`;
-                        psScript += `    return\n`;
-                        psScript += `}\n\n`;
-                        psScript += `if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($bwSession)) {\n`;
-                        psScript += `    Write-Failure 'Failed to unlock Bitwarden vault'\n`;
-                        psScript += `    return\n`;
-                        psScript += `}\n\n`;
-                        psScript += `if (-not (Invoke-NexoCleanup -BwSession $bwSession)) {\n`;
-                        psScript += `    Write-Error 'Cleanup script ended with errors.'\n`;
-                        psScript += `}\n`;
-                    psScript += `$encodedMerge | bw create item\n`;
-                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Created merged record: ${psName}' } else { Write-Failure 'Failed to create merged record: ${psName}'; exit 1 }\n`;
-                });
-                psScript += `\n`;
-            }
-
-            if (itemsArray.length > 0) {
-                psScript += `Write-Step 'Deleting selected items'\n`;
-                itemsArray.forEach((item, index) => {
-                    psScript += `# Deletion ${index + 1}: ${item.name}\n`;
-                    const psName = escapePowerShellSingleQuoted(item.name);
-                    psScript += `Write-Step 'Deleting item: ${psName}'\n`;
-                    psScript += `bw delete item ${item.id}\n`;
-                    psScript += `if ($LASTEXITCODE -eq 0) { Write-Success 'Deleted item: ${psName}' } else { Write-Failure 'Failed to delete item: ${psName}'; exit 1 }\n`;
-                });
-            }
-
-            psScript += `\nWrite-Success 'Cleanup complete'\n`;
-
-            // Set script content
-            document.getElementById('bashScriptText').value = bashScript;
-            document.getElementById('powershellScriptText').value = psScript;
-
-            // Show modal
-            document.getElementById('cliScriptModal').classList.add('show');
-            */
-        }
-
-        function showCLIScripts() {
             if (itemsToDelete.size === 0 && !originalData.items.some(i => i.isNexoMerge)) {
                 alert('⚠️ No changes detected (deletions or merges).');
                 return;
@@ -4378,13 +4250,41 @@
                 });
 
             const escapeShellSingleQuoted = (text) => String(text).replace(/'/g, `'\''`);
-            const escapePowerShellSingleQuoted = (text) => String(text).replace(/'/g, "''");
+            // Wrap PowerShell string values in double quotes ("), not single quotes ('),
+            // so a single quote inside a -Name value needs no escaping. Double-quoted
+            // strings require escaping the backtick (escape char), $, and " — in that order.
+            const escapePowerShellDoubleQuoted = (text) => String(text).replace(/`/g, '``').replace(/\$/g, '`$').replace(/"/g, '`"');
             const escapeDoubleQuoted = (text) => String(text).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
 
             let bashScript = `#!/usr/bin/env bash\nset -o pipefail\n\n`;
             bashScript += `print_step() { printf '\\033[36m[→]\\033[0m %s\\n' "$1"; }\n`;
             bashScript += `print_success() { printf '✅ Success!\\n'; }\n`;
             bashScript += `print_failure() { printf '❌ Failed!\\n'; }\n\n`;
+
+            bashScript += `new_bw_record() {\n`;
+            bashScript += `  local name="$1"\n`;
+            bashScript += `  local json="$2"\n`;
+            bashScript += `  printf 'Creating record %s .... ' "$name"\n`;
+            bashScript += `  if echo "$json" | bw encode | bw create item >/dev/null; then\n`;
+            bashScript += `    printf '✅ Success!\\n'\n`;
+            bashScript += `  else\n`;
+            bashScript += `    printf '❌ Failed!\\n'\n`;
+            bashScript += `    return 1\n`;
+            bashScript += `  fi\n`;
+            bashScript += `}\n\n`;
+
+            bashScript += `remove_bw_record() {\n`;
+            bashScript += `  local id="$1"\n`;
+            bashScript += `  local name="$2"\n`;
+            bashScript += `  printf 'Deleting record %s .... ' "$name"\n`;
+            bashScript += `  if bw delete item "$id" >/dev/null; then\n`;
+            bashScript += `    printf '✅ Success!\\n'\n`;
+            bashScript += `  else\n`;
+            bashScript += `    printf '❌ Failed!\\n'\n`;
+            bashScript += `    return 1\n`;
+            bashScript += `  fi\n`;
+            bashScript += `}\n\n`;
+
             bashScript += `main() {\n`;
             bashScript += `  # Nexo CLI Action Script\n`;
             bashScript += `  # Generated: ${new Date().toISOString()}\n`;
@@ -4413,13 +4313,7 @@
                     const shellName = escapeShellSingleQuoted(merge.name);
                     const shellJson = escapeShellSingleQuoted(merge.json);
                     bashScript += `  # Merge ${index + 1}: ${merge.name}\n`;
-                    bashScript += `  printf 'Creating record ${shellName} .... '\n`;
-                    bashScript += `  if echo '${shellJson}' | bw encode | bw create item; then\n`;
-                    bashScript += `    printf '✅ Success!\\n'\n`;
-                    bashScript += `  else\n`;
-                    bashScript += `    print_failure\n`;
-                    bashScript += `    return 1\n`;
-                    bashScript += `  fi\n`;
+                    bashScript += `  new_bw_record '${shellName}' '${shellJson}' || return 1\n`;
                 });
                 bashScript += `\n`;
             }
@@ -4429,13 +4323,7 @@
                 itemsArray.forEach((item, index) => {
                     const shellName = escapeShellSingleQuoted(item.name);
                     bashScript += `  # Deletion ${index + 1}: ${item.name}\n`;
-                    bashScript += `  printf 'Deleting record ${shellName} .... '\n`;
-                    bashScript += `  if bw delete item ${item.id}; then\n`;
-                    bashScript += `    printf '✅ Success!\\n'\n`;
-                    bashScript += `  else\n`;
-                    bashScript += `    print_failure\n`;
-                    bashScript += `    return 1\n`;
-                    bashScript += `  fi\n`;
+                    bashScript += `  remove_bw_record '${item.id}' '${shellName}' || return 1\n`;
                 });
             }
 
@@ -4450,6 +4338,23 @@
             psScript += `function Write-Step { param([string]$Message) Write-Host "→ $Message" -ForegroundColor Cyan }\n`;
             psScript += `function Write-Success { Write-Host '✅ Success!' -ForegroundColor Green }\n`;
             psScript += `function Write-Failure { Write-Host '❌ Failed!' -ForegroundColor Red }\n\n`;
+
+            psScript += `function New-BwRecord {\n`;
+            psScript += `    param([string]$Name, [string]$Json)\n`;
+            psScript += `    Write-Host -NoNewline "Creating record $Name .... "\n`;
+            psScript += `    $encoded = $Json | bw encode\n`;
+            psScript += `    if ($LASTEXITCODE -ne 0) { Write-Host '❌ Failed (encode)!' -ForegroundColor Red; throw "Encoding failed for $Name" }\n`;
+            psScript += `    $encoded | bw create item | Out-Null\n`;
+            psScript += `    if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Host '❌ Failed!' -ForegroundColor Red; throw "Creation failed for $Name" }\n`;
+            psScript += `}\n\n`;
+
+            psScript += `function Remove-BwRecord {\n`;
+            psScript += `    param([string]$Id, [string]$Name)\n`;
+            psScript += `    Write-Host -NoNewline "Deleting record $Name .... "\n`;
+            psScript += `    bw delete item $Id | Out-Null\n`;
+            psScript += `    if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Host '❌ Failed!' -ForegroundColor Red; throw "Deletion failed for $Name" }\n`;
+            psScript += `}\n\n`;
+
             psScript += `function Invoke-NexoCleanup {\n`;
             psScript += `    param([string]$BwSession)\n`;
             psScript += `    $env:BW_SESSION = $BwSession\n\n`;
@@ -4466,15 +4371,10 @@
             if (mergesArray.length > 0) {
                 psScript += `        Write-Step 'Creating merged records'\n`;
                 mergesArray.forEach((merge, index) => {
-                    const psName = escapePowerShellSingleQuoted(merge.name);
-                    const psJson = escapePowerShellSingleQuoted(merge.json);
+                    const psName = escapePowerShellDoubleQuoted(merge.name);
+                    const psJson = escapePowerShellDoubleQuoted(merge.json);
                     psScript += `        # Merge ${index + 1}: ${merge.name}\n`;
-                    psScript += `        Write-Host -NoNewline 'Creating record ${psName} .... '\n`;
-                    psScript += `        $mergeJson = @'\n${psJson}\n'@\n`;
-                    psScript += `        $encodedMerge = $mergeJson | bw encode\n`;
-                    psScript += `        if ($LASTEXITCODE -ne 0) { Write-Failure; return $false }\n`;
-                    psScript += `        $encodedMerge | bw create item\n`;
-                    psScript += `        if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Failure; return $false }\n`;
+                    psScript += `        New-BwRecord -Name "${psName}" -Json "${psJson}"\n`;
                 });
                 psScript += `\n`;
             }
@@ -4482,11 +4382,9 @@
             if (itemsArray.length > 0) {
                 psScript += `        Write-Step 'Deleting selected items'\n`;
                 itemsArray.forEach((item, index) => {
-                    const psName = escapePowerShellSingleQuoted(item.name);
+                    const psName = escapePowerShellDoubleQuoted(item.name);
                     psScript += `        # Deletion ${index + 1}: ${item.name}\n`;
-                    psScript += `        Write-Host -NoNewline 'Deleting record ${psName} .... '\n`;
-                    psScript += `        bw delete item ${item.id}\n`;
-                    psScript += `        if ($LASTEXITCODE -eq 0) { Write-Host '✅ Success!' -ForegroundColor Green } else { Write-Failure; return $false }\n`;
+                    psScript += `        Remove-BwRecord -Id "${item.id}" -Name "${psName}"\n`;
                 });
             }
 
