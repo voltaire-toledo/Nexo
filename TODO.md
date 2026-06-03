@@ -73,6 +73,7 @@ Nexo is now a full-fledged duplicate-cleanup engine. It doesn't just find duplic
 - [🚧] Introduce compact cluster rows with one selected cluster shown in a focused compare panel.
 - [🚧] Keep field-level diffs, merge previews, and destructive actions behind progressive disclosure.
 - [⏸️] Defer the REPL-style terminal confirmation pane to the next release.
+- [⏸️] Defer code optimization/refactoring debt until functionality, user flow, and visual aesthetics are at a much higher maturity level.
 - [ ] Define the "default triage queue" ordering so the riskiest records appear first.
 - [ ] Add a compact row schema for cluster type, confidence, actions needed, and suggested outcome.
 - [ ] Design a side-by-side compare panel that highlights only differing fields by default.
