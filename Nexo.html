@@ -35,22 +35,22 @@
 
             --fg-base: #233F4C;
             --fg-muted: #3d5a68;
-            --fg-subtle: #5a7684;
-            --fg-ghost: #8aa1ae;
+            /* fg-subtle/ghost tuned to clear WCAG AA 4.5:1 on the card background (--bg-muted) */
+            --fg-subtle: #45606c;
+            --fg-ghost: #4f6975;
 
-            --border: #dbdbc7;
-            --border-subtle: #e8e8d9;
+            --border: #c7c7b0;
+            --border-subtle: #d7d7c6;
 
-            /* Compatibility aliases for older selectors kept elsewhere in this file */
-            --bg-primary: var(--bg-surface);
-            --bg-hover: var(--bg-muted);
-            --border-color: var(--border);
-            --accent-primary: var(--accent);
-            --text-primary: var(--fg-base);
-            --text-secondary: var(--fg-muted);
-            --text-tertiary: var(--fg-subtle);
-            --text-muted: var(--fg-muted);
-            --warning-color: var(--warning);
+            /* Accessible accents (AA on the surfaces where they're used) */
+            --link: #1d6f78;
+            /* link text — 4.5:1 on white */
+            --positive: #0F6670;
+            /* "present" field indicator — 4.5:1 on the card */
+            --delete-border: #cf3a2c;
+            /* marked-for-deletion border — 3:1 vs card & hover */
+            --chip-bg: #d3d3bf;
+            /* detail-pair background, distinct from card + hover */
 
             /* Elevation & Rhythm */
             --shadow-sm: 0 1px 2px rgba(35, 63, 76, 0.08);
@@ -77,11 +77,17 @@
 
             --fg-base: #F1F1E6;
             --fg-muted: #B1CEDE;
-            --fg-subtle: #8aa1ae;
-            --fg-ghost: #5a7684;
+            /* fg-subtle/ghost tuned to clear WCAG AA 4.5:1 on the dark card */
+            --fg-subtle: #b3c6d0;
+            --fg-ghost: #a4bbc7;
 
-            --border: #2d4d5a;
+            --border: #4a6a78;
             --border-subtle: #3a5f6d;
+
+            --link: #e6a866;
+            --positive: #5fc9ba;
+            --delete-border: #e08a8a;
+            --chip-bg: #3c6172;
 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
@@ -96,11 +102,16 @@
 
                 --fg-base: #F1F1E6;
                 --fg-muted: #B1CEDE;
-                --fg-subtle: #8aa1ae;
-                --fg-ghost: #5a7684;
+                --fg-subtle: #b3c6d0;
+                --fg-ghost: #a4bbc7;
 
-                --border: #2d4d5a;
+                --border: #4a6a78;
                 --border-subtle: #3a5f6d;
+
+                --link: #e6a866;
+                --positive: #5fc9ba;
+                --delete-border: #e08a8a;
+                --chip-bg: #3c6172;
             }
         }
 
@@ -166,9 +177,9 @@
         }
 
         .theme-toggle:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
+            background: var(--bg-muted);
+            border-color: var(--accent);
+            color: var(--accent);
             box-shadow: var(--shadow-md);
         }
 
@@ -351,17 +362,6 @@
         .btn-primary:hover:not(:disabled) {
             background: var(--accent-hover);
             border-color: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            background: #b91c1c;
             transform: translateY(-1px);
         }
 
@@ -581,13 +581,11 @@
         }
 
         .cluster.merge-available {
-            background: #f4faf9;
-            border-color: var(--teal-light);
-        }
-
-        :root[data-theme="dark"] .cluster.merge-available {
-            background: #1e3540;
-            border-color: var(--teal-deep);
+            /* Teal wash + accent border (matches the Review & Merge button) so
+               mergeable clusters read at a glance; color-mix adapts to both themes. */
+            background: color-mix(in srgb, var(--teal-mid) 22%, var(--bg-surface));
+            border-color: var(--teal-mid);
+            border-left-width: 3px;
         }
 
         .cluster:hover {
@@ -687,12 +685,6 @@
             border-color: #fed7aa;
         }
 
-        .tag-score {
-            background: #f8fafc;
-            color: #0f172a;
-            border-color: #cbd5e1;
-        }
-
         .match-tag-icon {
             display: inline-flex;
             width: 0.9rem;
@@ -706,23 +698,6 @@
             width: 100%;
             height: 100%;
             display: block;
-        }
-
-        .divergence-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            border: 1.5px solid var(--accent);
-            border-radius: 0;
-            color: var(--accent);
-            font-weight: 900;
-            font-size: 0.875rem;
-            margin-left: 0.5rem;
-            vertical-align: middle;
-            background: var(--bg-surface);
-            line-height: 1;
         }
 
         .cluster-actions {
@@ -749,12 +724,6 @@
             gap: 0.25rem;
         }
 
-        .divergent-value {
-            font-weight: 700;
-            text-decoration: underline decoration-style wavy var(--accent);
-            text-underline-offset: 3px;
-        }
-
         /* ===== ITEM CARD ===== */
         .item-card {
             background: var(--bg-muted);
@@ -777,7 +746,9 @@
         }
 
         .item-card.marked-delete {
-            border-color: var(--danger);
+            /* Per-theme softened red that still clears 3:1 vs the card (WCAG 1.4.11)
+               without the harsh full-saturation border in dark mode. */
+            border-color: var(--delete-border);
             background: var(--bg-subtle);
         }
 
@@ -788,30 +759,6 @@
 
         .item-card-baseline-expanded {
             align-items: start;
-        }
-
-        .item-card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            min-width: 0;
-        }
-
-        .item-card-heading {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            min-width: 0;
-            white-space: nowrap;
-            flex: 1;
-        }
-
-        .item-name-toggle {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-            cursor: pointer;
-            accent-color: var(--accent);
         }
 
         .item-name {
@@ -864,10 +811,6 @@
 
         :root[data-theme="dark"] .item-delete-control svg {
             color: #fca5a5;
-        }
-
-        .item-delete-placeholder {
-            display: none;
         }
 
         .item-name-wrap {
@@ -955,40 +898,12 @@
             white-space: nowrap;
         }
 
-        .item-baseline-expanded-list {
-            grid-column: 1 / -1;
-            margin-top: 0.15rem;
-            padding-top: 0.1rem;
-            border-top: 1px solid rgba(203, 127, 41, 0.12);
-        }
-
         .item-details {
             font-size: 0.98rem;
             line-height: 1.65;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-        }
-
-        .item-diff-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .item-chip-list {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem 1rem;
-            flex-wrap: wrap;
-            min-width: 0;
-            overflow: visible;
-            white-space: normal;
-            scrollbar-width: auto;
-        }
-
-        .item-chip-list::-webkit-scrollbar {
-            display: none;
         }
 
         .item-compact-chip {
@@ -1028,7 +943,7 @@
         }
 
         .item-compact-chip.present {
-            color: var(--teal-deep);
+            color: var(--positive);
         }
 
         .item-compact-chip.absent {
@@ -1047,10 +962,6 @@
             color: #1d4ed8;
         }
 
-        .item-compact-chip.warning {
-            color: var(--danger);
-        }
-
         .item-card-baseline .item-name,
         .item-card-baseline .item-card-subtitle {
             color: var(--fg-base);
@@ -1066,47 +977,6 @@
 
         .item-card-baseline .item-compact-chip.difference {
             color: var(--accent-hover);
-        }
-
-        .item-diff-row {
-            grid-template-columns: 92px 1fr;
-            gap: 0.75rem;
-            padding: 0.55rem 0.65rem;
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid var(--border-subtle);
-            border-radius: 0;
-        }
-
-        .item-diff-row .detail-label {
-            padding-top: 0;
-        }
-
-        .item-diff-row .detail-value {
-            line-height: 1.45;
-        }
-
-        .item-diff-empty {
-            padding: 0.35rem 0;
-            border: none;
-            border-radius: 0;
-            color: var(--fg-subtle);
-            background: none;
-            font-size: 0.92rem;
-        }
-
-        .item-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.92rem;
-            color: var(--fg-subtle);
-        }
-
-        .item-card-header,
-        .item-diff-list,
-        .item-card-footer {
-            display: none;
         }
 
         .identical-audit-banner {
@@ -1154,18 +1024,6 @@
             overflow: visible;
         }
 
-        .item-diff-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0;
-            border-radius: 0;
-            background: none;
-            color: var(--accent-hover);
-            border: none;
-            font-weight: 600;
-        }
-
         .item-detail {
             display: grid;
             grid-template-columns: 100px 1fr;
@@ -1198,7 +1056,10 @@
             gap: 0.2rem;
             padding: 0.05rem 0.22rem;
             border-radius: 3px;
-            border: 1px solid transparent;
+            /* Distinct chip surface so each pair separates from the card
+               background and its hover state in both themes. */
+            background: var(--chip-bg);
+            border: 1px solid var(--border);
         }
 
         .detail-pair-label {
@@ -1261,57 +1122,6 @@
             font-style: italic;
         }
 
-        .uri-list {
-            list-style: disc;
-            margin: 0;
-            padding: 0 0 0 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-
-        .uri-list li {
-            word-break: break-all;
-            font-size: 0.92rem;
-            color: var(--fg-muted);
-            font-family: var(--font-mono);
-            font-feature-settings: "tnum";
-        }
-
-        /* Password Display */
-        .password-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .password-value {
-            font-family: var(--font-mono);
-            letter-spacing: 0.05em;
-            font-feature-settings: "tnum";
-        }
-
-        .password-toggle {
-            background: none;
-            border: none;
-            color: var(--fg-ghost);
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            transition: color var(--transition);
-            border-radius: 0;
-        }
-
-        .password-toggle:hover {
-            color: var(--accent);
-        }
-
-        .password-toggle:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-
         .metadata-tags {
             display: flex;
             gap: 0.75rem;
@@ -1337,32 +1147,12 @@
         }
 
         .meta-tag.present {
-            color: var(--teal-deep);
+            color: var(--positive);
         }
 
         .meta-tag.absent {
             color: var(--fg-ghost);
             opacity: 0.75;
-        }
-
-        .completeness-score {
-            margin-top: 0.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .score-bar {
-            background: var(--bg-subtle);
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
-
-        .score-fill {
-            height: 100%;
-            background: var(--accent);
-            transition: width var(--transition);
         }
 
         /* High-Visibility Focus States */
@@ -1377,16 +1167,6 @@
         .item-card.marked-delete .item-name {
             text-decoration: line-through;
             color: var(--fg-base);
-        }
-
-        .difference-indicator {
-            background: none;
-            color: var(--warning-color);
-            padding: 0;
-            border-radius: 0;
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-left: 0.35rem;
         }
 
         /* ===== LOADING SPINNER ===== */
@@ -1435,9 +1215,9 @@
 
         /* ===== INSTRUCTIONS PANEL ===== */
         .instructions {
-            background: var(--bg-primary);
+            background: var(--bg-surface);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             padding: 1.25rem clamp(1rem, 2vw, 1.5rem);
             box-shadow: var(--shadow-sm);
             display: flex;
@@ -1564,7 +1344,7 @@
         .instructions h3 {
             margin-top: 0;
             margin-bottom: 0.25rem;
-            color: var(--text-primary);
+            color: var(--fg-base);
             font-size: 1.1rem;
             font-weight: 600;
             letter-spacing: -0.02em;
@@ -1578,7 +1358,7 @@
 
         .instructions li {
             margin-bottom: 0.375rem;
-            color: var(--text-secondary);
+            color: var(--fg-muted);
             line-height: 1.4;
             padding-left: 0;
             font-size: clamp(0.92rem, 1vw, 0.98rem);
@@ -1636,7 +1416,7 @@
         }
 
         .instructions p {
-            color: var(--text-secondary);
+            color: var(--fg-muted);
             line-height: 1.55;
             font-size: clamp(0.95rem, 1vw, 1rem);
         }
@@ -1890,17 +1670,31 @@
                 margin-left: auto;
             }
 
-            .header h1 {
+            .page-title h1 {
                 font-size: 26px;
             }
 
             .items-grid {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .results-header {
-                flex-direction: column;
-                align-items: flex-start;
+        @media (max-width: 600px) {
+            .status-actions .btn-label {
+                /* Collapse to icon-only; title/aria-label preserve meaning */
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            .status-actions .btn {
+                padding: 0.5rem;
             }
         }
 
@@ -1909,17 +1703,6 @@
             display: none !important;
         }
 
-        .text-center {
-            text-align: center;
-        }
-
-        .mb-4 {
-            margin-bottom: 16px;
-        }
-
-        .mt-4 {
-            margin-top: 16px;
-        }
     </style>
 </head>
 
@@ -2033,7 +1816,7 @@
                 aria-label="Upload a Bitwarden JSON export">
                 <div class="upload-zone-header">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        style="stroke: var(--text-muted); margin: 0 auto;">
+                        style="stroke: var(--anchor); margin: 0 auto;">
                         <path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1" stroke-width="2"
                             stroke-linecap="round" />
                         <path d="M9 15l3 -3l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -2068,7 +1851,7 @@
             <div id="export-web" class="export-content">
                 <ol class="instruction-list">
                     <li>Log in to your <a href="https://vault.bitwarden.com" target="_blank"
-                            style="color: var(--accent);">Bitwarden Web Vault</a>.</li>
+                            style="color: var(--link);">Bitwarden Web Vault</a>.</li>
                     <li>Navigate to <strong>Tools</strong> &rarr; <strong>Export Vault</strong>.</li>
                     <li>Select <strong>.json</strong> as the Format (<strong>Warning:</strong> Do not select Encrypted
                         JSON).</li>
@@ -2089,18 +1872,6 @@
                 </ol>
             </div>
         </div>
-
-        <footer class="footer-disclaimer">
-            <p>
-                <strong>⚠️ Open Source Notice & Disclaimer:</strong> Nexo is a free, transparent utility provided "as
-                is." Nexo is built on a simple principle: <strong>Your data belongs to you.</strong> You should have the freedom to
-                move, clean, and manage your vault exactly how you see fit. We provide the logic; you keep the control."
-            </p>
-            <p>
-                <strong>LEGAL NOTICE:</strong> Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an
-                independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.
-            </p>
-        </footer>
 
         <!-- Results Section -->
         <div class="results-section" id="resultsSection">
@@ -2240,7 +2011,7 @@
                             <h4>Run in Bash</h4>
                             <ol>
                                 <li>Install <a href="https://bitwarden.com/help/cli/" target="_blank"
-                                        style="color: var(--accent-primary);">Bitwarden CLI</a> and make sure <code>bw</code>
+                                        style="color: var(--link);">Bitwarden CLI</a> and make sure <code>bw</code>
                                     is available in your terminal.</li>
                                 <li>If this is a fresh shell, log in first with <code>bw login</code>.</li>
                                 <li>Save the script to a file such as <code>nexo-actions.sh</code>.</li>
@@ -2261,7 +2032,7 @@
                             <h4>Run in PowerShell</h4>
                             <ol>
                                 <li>Install <a href="https://bitwarden.com/help/cli/" target="_blank"
-                                        style="color: var(--accent-primary);">Bitwarden CLI</a> and make sure <code>bw</code>
+                                        style="color: var(--link);">Bitwarden CLI</a> and make sure <code>bw</code>
                                     is available in PowerShell.</li>
                                 <li>If this is a fresh session, log in first with <code>bw login</code>.</li>
                                 <li>Save the script to a file such as <code>nexo-actions.ps1</code>.</li>
@@ -2288,6 +2059,18 @@
                     stroke-linejoin="round" />
             </svg>
         </button>
+
+        <footer class="footer-disclaimer">
+            <p>
+                <strong>⚠️ Open Source Notice & Disclaimer:</strong> Nexo is a free, transparent utility provided "as
+                is." Nexo is built on a simple principle: <strong>Your data belongs to you.</strong> You should have the freedom to
+                move, clean, and manage your vault exactly how you see fit. We provide the logic; you keep the control.
+            </p>
+            <p>
+                <strong>LEGAL NOTICE:</strong> Bitwarden® is a registered trademark of Bitwarden Inc. Nexo is an
+                independent project and is not affiliated with, endorsed by, or sponsored by Bitwarden Inc.
+            </p>
+        </footer>
 
     </div>
 
@@ -3993,21 +3776,6 @@
         }
 
         /**
-         * Get type name from type number
-         * @param {number} type - Type code
-         * @returns {string} - Type name
-         */
-        function getTypeName(type) {
-            const types = {
-                1: 'Login',
-                2: 'Secure Note',
-                3: 'Card',
-                4: 'Identity'
-            };
-            return types[type] || 'Unknown';
-        }
-
-        /**
          * Format date for display
          * @param {string} dateStr - ISO date string
          * @returns {string} - Formatted date
@@ -4570,29 +4338,6 @@
             }
 
             storeTheme(resolvedTheme);
-        }
-
-        /**
-         * Toggle password visibility for a specific item
-         * @param {string} itemId - Item UUID
-         */
-        function togglePasswordVisibility(itemId) {
-            const pwdElement = document.getElementById(`pwd-${itemId}`);
-            if (!pwdElement) return;
-
-            const isMasked = pwdElement.getAttribute('data-masked') === 'true';
-            const item = items.find(i => i.id === itemId);
-            if (!item) return;
-
-            if (isMasked) {
-                // Show full password
-                pwdElement.textContent = item.password;
-                pwdElement.setAttribute('data-masked', 'false');
-            } else {
-                // Show masked password
-                pwdElement.textContent = item.maskedPassword;
-                pwdElement.setAttribute('data-masked', 'true');
-            }
         }
     </script>
 </body>
