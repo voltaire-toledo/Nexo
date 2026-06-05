@@ -1,13 +1,18 @@
-# Graph Report - .  (2026-06-02)
+# Graph Report - VT-Nexo  (2026-06-03)
 
 ## Corpus Check
-- 27 files · ~117,694 words
+- 20 files · ~116,739 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 164 nodes · 210 edges · 18 communities (13 shown, 5 thin omitted)
-- Extraction: 77% EXTRACTED · 23% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.85)
-- Token cost: 166,685 input · 0 output
+- 337 nodes · 367 edges · 30 communities (22 shown, 8 thin omitted)
+- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.85)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `8fc70ff5`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Bitwarden Export & App Intake|Bitwarden Export & App Intake]]
@@ -27,18 +32,30 @@
 - [[_COMMUNITY_Release Packaging|Release Packaging]]
 - [[_COMMUNITY_test-vault.js Script|test-vault.js Script]]
 - [[_COMMUNITY_vault-logic.js Logic Module|vault-logic.js Logic Module]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Nexo Application` - 31 edges
-2. `Bitwarden JSON Export File` - 12 edges
-3. `graph.json output` - 12 edges
-4. `Bitwarden Vault` - 8 edges
-5. `Nexo Home Page UI` - 7 edges
-6. `Semantic extraction (Part B subagents)` - 7 edges
-7. `graphify pipeline` - 6 edges
-8. `AST structural extraction (Part A)` - 6 edges
-9. `Build graph, cluster, analyze` - 6 edges
-10. `findDuplicates` - 6 edges
+2. `Nexo - TODO` - 12 edges
+3. `Bitwarden JSON Export File` - 12 edges
+4. `graph.json output` - 12 edges
+5. `/graphify` - 11 edges
+6. `What You Must Do When Invoked` - 11 edges
+7. `Quick Start Testing` - 11 edges
+8. `Release Guide` - 9 edges
+9. `Quick Test Guide` - 9 edges
+10. `Product Requirements Document: Nexo` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Bitwarden CLI Adapter` --conceptually_related_to--> `export_vault.sh Bitwarden Export Script`  [INFERRED]
@@ -63,75 +80,111 @@
 - **Ingest and Cluster Pipeline** — nexo_handlefileupload, nexo_parseandanalyzedata, nexo_validatebitwardenformat, nexo_parseitemssafely, nexo_findduplicates, nexo_createcluster [EXTRACTED 0.85]
 - **Weighted Scoring and Ranking Engine** — nexo_rankandsuggest, nexo_isstub, nexo_calculateclustermatchscore, prd_weighted_scoring [INFERRED 0.85]
 
-## Communities (18 total, 5 thin omitted)
+## Communities (30 total, 8 thin omitted)
 
 ### Community 0 - "Bitwarden Export & App Intake"
-Cohesion: 0.10
-Nodes (38): Bitwarden CLI, Bitwarden JSON Export File, Bitwarden Vault, Bitwarden Web Vault, Disclaimer & Legal Notice, Nexo App UI - Main Screen (dlmodes), Duplicate Detection Feature, File Upload Drop Zone (+30 more)
+Cohesion: 0.08
+Nodes (44): Bitwarden CLI, Bitwarden CLI Export Tab, Bitwarden JSON Export File, Bitwarden Vault, Bitwarden Web Vault, Disclaimer & Legal Notice, Nexo App UI - Main Screen (dlmodes), Duplicate Detection Feature (+36 more)
 
 ### Community 1 - "Merge & Safe-Item Pipeline"
-Cohesion: 0.11
-Nodes (22): Action Package Schema, Dry-Run Verification Step, Nexo CLAUDE.md Guidance, buildMergeDraft, createSafeItem, executeMerge, exportCleanedData, extractDomain (+14 more)
+Cohesion: 0.10
+Nodes (24): Action Package Schema, Dry-Run Verification Step, Shared Core Extraction, TUI Second Client, Nexo CLAUDE.md Guidance, buildMergeDraft, createSafeItem, executeMerge (+16 more)
 
 ### Community 2 - "Graphify Extraction Pipeline"
-Cohesion: 0.12
-Nodes (20): graphify skill trigger, AST structural extraction (Part A), Cumulative cost/token tracker, graphify.detect.detect (Step 2), Find-GraphifyPython interpreter detection, Gemini extraction backend, Merge AST + semantic (Part C), graphify pipeline (+12 more)
+Cohesion: 0.08
+Nodes (29): graphify skill trigger, AST structural extraction (Part A), Build graph, cluster, analyze, Community Detection, Cumulative cost/token tracker, graphify.detect.detect (Step 2), Find-GraphifyPython interpreter detection, Gemini extraction backend (+21 more)
 
 ### Community 3 - "Graphify Outputs & Query"
 Cohesion: 0.14
 Nodes (16): Fast path for existing graph, graph.json output, HTML graph visualization export, Obsidian vault export, graphify add URL ingest, GraphML export, MCP stdio server, Neo4j Cypher export (+8 more)
 
 ### Community 4 - "Scoring & Stub Detection"
-Cohesion: 0.19
-Nodes (13): buildClusterMatchTags, calculateClusterMatchScore, calculateCompleteness, createCluster, isImportFolder, isStub, normalizeUsername, rankAndSuggest (+5 more)
+Cohesion: 0.13
+Nodes (18): Bitwarden CLI Adapter, export_vault.sh script, safe_exit(), export_vault.sh Bitwarden Export Script, buildClusterMatchTags, calculateClusterMatchScore, calculateCompleteness, createCluster (+10 more)
 
 ### Community 5 - "Nexo Logo Design"
 Cohesion: 0.31
 Nodes (10): Central Accent Circle, Rounded Square Background, Nexo Brand Identity, Amber/Orange Accent Color (#C9822B), Cream/Off-White Stroke Color (#F3EFE4), Dark Teal Background Color (#1E3D46), Diagonal Connecting Stroke, Stylized Letter N Letterform (+2 more)
 
 ### Community 6 - "Graph Build & Analysis"
-Cohesion: 0.25
-Nodes (9): Build graph, cluster, analyze, Community Detection, God Nodes, GRAPH_REPORT.md output, Knowledge Graph, Label communities, Wiki export, Whisper transcribe_all (+1 more)
+Cohesion: 0.07
+Nodes (26): 10. Cross-Browser Testing (Optional), 1. Open the Tool, 2. Security Verification (Before Loading Data), 3. Test with Your Bitwarden Export, 4. Review Duplicate Detection, 5. Test Selection Features, 6. Test Export Functionality, 7. Test Clear Data (+18 more)
 
 ### Community 7 - "Export Script & Automation Roadmap"
-Cohesion: 0.29
-Nodes (7): Bitwarden CLI Adapter, Shared Core Extraction, TUI Second Client, export_vault.sh script, safe_exit(), export_vault.sh Bitwarden Export Script, Nexo TODO Tracker
+Cohesion: 0.11
+Nodes (18): 1. Split "review" from "execution format", 2. Add a CLI-assisted intake mode, 3. Save a review package, 4. Add a dry-run verification step, Adapters, Architecture Recommendation, Automation Notes, Bottom Line (+10 more)
 
 ### Community 8 - "Deletion Safety & Recoverable Records"
 Cohesion: 0.40
 Nodes (5): CLI Deletion Script, TOTP and Passkeys Records, Vault Trash, TOTP and Passkeys (Recoverable Records), Bitwarden Vault Trash
 
 ### Community 10 - "Vault Export Tabs"
-Cohesion: 0.67
-Nodes (3): Bitwarden CLI Export Tab, Step 1 - Export Vault (Unencrypted JSON), Web Vault Export Tab
+Cohesion: 0.11
+Nodes (18): 1. Executive Summary, 2. Goals & Objectives, 3.1 Nexo Matching Engine, 3.2 Synthesis & Merging, 3.3 Precision UI, 3. Functional Requirements, 4.1 Scoring Weights, 4. Technical Architecture (+10 more)
 
 ### Community 11 - "Differential Comparison UI"
 Cohesion: 0.67
 Nodes (3): buildCompactItemDetails, buildItemComparisonChips, Differential Highlighting
 
 ### Community 12 - "Migration Import Workflow"
-Cohesion: 0.67
-Nodes (3): Warning: Import to Non-Empty Vault Creates Duplicates, Alternative JSON Export Workflow (For Migrations), Password Manager Migration (1Password, Proton Pass)
+Cohesion: 0.13
+Nodes (14): Current Status Summary, 🚧 Final Testing (Future Session), ✅ Implementation Complete (v1.2), Legend, Nexo - TODO, Phase 1: Core Functionality (Complete ✅), Phase 2: User Interface (Complete ✅), Phase 3: Export & Security (Complete ✅) (+6 more)
+
+### Community 14 - "Audit Trail & Honesty Rules"
+Cohesion: 0.07
+Nodes (26): EXTRACTED/INFERRED/AMBIGUOUS audit trail, For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands (+18 more)
+
+### Community 18 - "Community 18"
+Cohesion: 0.17
+Nodes (10): Critical architecture fact, Direction (not yet built), graphify, Known wart, Pipeline inside Nexo.html (follow this order when tracing behavior), Releasing, Running / testing, Security invariants to verify after any change (from TEST_GUIDE.md) (+2 more)
+
+### Community 19 - "Community 19"
+Cohesion: 0.17
+Nodes (11): 1. Selective Cleaning (Safe & Recoverable), 2. Seamless Migration (Cross-Manager), 3. Expert Mode: Import the Cleaned JSON back into your Vault, ⚠️ Conflict & SSO Protection, ≠ Differential Highlighting, ⚠️ Disclaimer & Liability Warning, Features, Legal Notice (+3 more)
+
+### Community 20 - "Community 20"
+Cohesion: 0.20
+Nodes (9): 1. Review the Working Tree, 2. Stage the Release Files, 3. Commit the Changes, 4. Push the Main Branch, 5. Create and Push the Release Tag, 6. Verify the Release, 7. If You Need to Rebuild the Release, Prerequisites (+1 more)
+
+### Community 21 - "Community 21"
+Cohesion: 0.25
+Nodes (7): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
+
+### Community 22 - "Community 22"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 23 - "Community 23"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 24 - "Community 24"
+Cohesion: 0.50
+Nodes (3): For /graphify explain, For /graphify path, graphify reference: query, path, explain
+
+### Community 25 - "Community 25"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ## Knowledge Gaps
-- **55 isolated node(s):** `fs`, `path`, `test-vault.js — CLI Vault Analysis Script`, `vault-logic.js — Pure Logic Module`, `Nexo App UI - Main Screen (dlmodes)` (+50 more)
+- **179 isolated node(s):** `fs`, `path`, `graphify`, `Usage`, `What graphify is for` (+174 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Nexo Application` connect `Bitwarden Export & App Intake` to `Vault Export Tabs`, `Nexo Logo Design`?**
-  _High betweenness centrality (0.098) - this node is a cross-community bridge._
-- **Why does `Build graph, cluster, analyze` connect `Graph Build & Analysis` to `Graphify Extraction Pipeline`, `Graphify Outputs & Query`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Why does `graph.json output` connect `Graphify Outputs & Query` to `Graph Build & Analysis`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `Nexo Application` connect `Bitwarden Export & App Intake` to `Nexo Logo Design`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `Build graph, cluster, analyze` connect `Graphify Extraction Pipeline` to `Graphify Outputs & Query`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `graph.json output` connect `Graphify Outputs & Query` to `Graphify Extraction Pipeline`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `Nexo Application` (e.g. with `Bitwarden JSON Export File` and `Nexo Dark UI Theme`) actually correct?**
   _`Nexo Application` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `Bitwarden JSON Export File` (e.g. with `Nexo Application` and `Duplicate Finder Feature`) actually correct?**
   _`Bitwarden JSON Export File` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `graph.json output` (e.g. with `HTML graph visualization export` and `Obsidian vault export`) actually correct?**
   _`graph.json output` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `Bitwarden Vault` (e.g. with `Bitwarden CLI Export Tab` and `Duplicate Finder Feature`) actually correct?**
-  _`Bitwarden Vault` has 6 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `fs`, `path`, `graphify` to the rest of the system?**
+  _186 weakly-connected nodes found - possible documentation gaps or missing edges._
