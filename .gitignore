@@ -1,18 +1,8 @@
-# Local agent/tooling state
-.agents/
-.gemini/
-.github/skills/
-.playground/
-
 # OS/editor noise
 .DS_Store
 Thumbs.db
 *.json
-
-# Local environment files
-.env
-.env.*
-*.local
+**/desktop.ini
 
 # Vault import/export artifacts
 # This repo should not contain real Bitwarden or password-manager data.
@@ -25,11 +15,3 @@ Thumbs.db
 !/deno.jsonc
 !/composer.json
 
-/*.csv
-/*.tsv
-/*.xml
-/*.zip
-/*.1pif
-/*.1pux
-/*.kdbx
-/*.kdbxx
